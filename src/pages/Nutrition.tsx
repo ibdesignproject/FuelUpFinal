@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Plus, BarChart2, Droplet, Award, Beef, Flame } from 'lucide-react';
 import { userProfileService, NutritionLog } from '@/services/userProfile';
 import { toast } from '@/components/ui/use-toast';
+import { Progress } from '@/components/ui/progress';
 
 const Nutrition = () => {
   const [nutritionLog, setNutritionLog] = useState<NutritionLog | null>(null);
@@ -15,13 +15,11 @@ const Nutrition = () => {
   const [showProteinInput, setShowProteinInput] = useState(false);
   const [showCaloriesInput, setShowCaloriesInput] = useState(false);
   
-  // Calculate progress percentages
   const waterProgress = nutritionLog ? Math.min((nutritionLog.water / 2000) * 100, 100) : 0;
   const proteinProgress = nutritionLog ? Math.min((nutritionLog.protein / 120) * 100, 100) : 0;
   const calorieProgress = nutritionLog ? Math.min((nutritionLog.calories / 2500) * 100, 100) : 0;
   
   useEffect(() => {
-    // Load nutrition log
     const log = userProfileService.getTodayNutritionLog();
     setNutritionLog(log);
   }, []);
@@ -37,7 +35,6 @@ const Nutrition = () => {
     
     userProfileService.updateWaterIntake(waterAmount);
     
-    // Refresh log data
     const updatedLog = userProfileService.getTodayNutritionLog();
     setNutritionLog(updatedLog);
     
@@ -58,10 +55,9 @@ const Nutrition = () => {
       return;
     }
     
-    // Create a simple meal structure for the protein
     const proteinMeal = {
       name: "Protein Intake",
-      calories: 0, // We're only tracking protein here
+      calories: 0,
       protein: proteinAmount,
       carbs: 0,
       fat: 0,
@@ -70,7 +66,6 @@ const Nutrition = () => {
     
     userProfileService.addMeal(proteinMeal);
     
-    // Refresh log data
     const updatedLog = userProfileService.getTodayNutritionLog();
     setNutritionLog(updatedLog);
     
@@ -91,11 +86,10 @@ const Nutrition = () => {
       return;
     }
     
-    // Create a simple meal structure for the calories
     const calorieMeal = {
       name: "Calorie Intake",
       calories: caloriesAmount,
-      protein: 0, // We're only tracking calories here
+      protein: 0,
       carbs: 0,
       fat: 0,
       time: "snack"
@@ -103,7 +97,6 @@ const Nutrition = () => {
     
     userProfileService.addMeal(calorieMeal);
     
-    // Refresh log data
     const updatedLog = userProfileService.getTodayNutritionLog();
     setNutritionLog(updatedLog);
     
@@ -129,87 +122,126 @@ const Nutrition = () => {
               
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="flex flex-col items-center">
-                  <div className="relative h-20 w-20 mb-2">
-                    <svg className="w-full h-full" viewBox="0 0 36 36">
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="rgba(245, 242, 237, 0.3)"
-                        strokeWidth="3"
+                  <div className="h-20 w-20 mb-2 relative flex items-center justify-center">
+                    <svg className="w-full h-full absolute" viewBox="0 0 100 100">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="none" 
+                        stroke="rgba(245, 242, 237, 0.3)" 
+                        strokeWidth="8"
                       />
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#f5f2ed"
-                        strokeWidth="3"
-                        strokeDasharray={`${waterProgress}, 100`}
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="none" 
+                        stroke="#f5f2ed" 
+                        strokeWidth="8"
+                        strokeDasharray={`${waterProgress * 2.51}, 251`}
+                        strokeLinecap="round"
+                        transform="rotate(-90 50 50)"
                       />
                     </svg>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <Droplet size={24} className="mx-auto" />
-                      <span className="text-xs font-medium block">
-                        {nutritionLog?.water || 0}/2000ml
-                      </span>
+                    <div className="flex flex-col items-center justify-center z-10">
+                      <Droplet size={18} className="mb-1" />
+                      <div className="text-xs font-medium">
+                        {nutritionLog?.water || 0}
+                        <span className="text-[10px] opacity-75 ml-0.5">ml</span>
+                      </div>
                     </div>
                   </div>
                   <span className="text-sm font-medium">Water</span>
-                  <span className="text-xs">{waterProgress.toFixed(0)}%</span>
+                  <div className="w-full mt-1">
+                    <Progress 
+                      value={waterProgress} 
+                      className="h-1.5 bg-white/30" 
+                      indicatorColor="bg-white"
+                    />
+                  </div>
                 </div>
                 
                 <div className="flex flex-col items-center">
-                  <div className="relative h-20 w-20 mb-2">
-                    <svg className="w-full h-full" viewBox="0 0 36 36">
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="rgba(245, 242, 237, 0.3)"
-                        strokeWidth="3"
+                  <div className="h-20 w-20 mb-2 relative flex items-center justify-center">
+                    <svg className="w-full h-full absolute" viewBox="0 0 100 100">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="none" 
+                        stroke="rgba(245, 242, 237, 0.3)" 
+                        strokeWidth="8"
                       />
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#f5f2ed"
-                        strokeWidth="3"
-                        strokeDasharray={`${proteinProgress}, 100`}
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="none" 
+                        stroke="#f5f2ed" 
+                        strokeWidth="8"
+                        strokeDasharray={`${proteinProgress * 2.51}, 251`}
+                        strokeLinecap="round"
+                        transform="rotate(-90 50 50)"
                       />
                     </svg>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <Beef size={24} className="mx-auto" />
-                      <span className="text-xs font-medium block">
-                        {nutritionLog?.protein || 0}/120g
-                      </span>
+                    <div className="flex flex-col items-center justify-center z-10">
+                      <Beef size={18} className="mb-1" />
+                      <div className="text-xs font-medium">
+                        {nutritionLog?.protein || 0}
+                        <span className="text-[10px] opacity-75 ml-0.5">g</span>
+                      </div>
                     </div>
                   </div>
                   <span className="text-sm font-medium">Protein</span>
-                  <span className="text-xs">{proteinProgress.toFixed(0)}%</span>
+                  <div className="w-full mt-1">
+                    <Progress 
+                      value={proteinProgress} 
+                      className="h-1.5 bg-white/30" 
+                      indicatorColor="bg-white"
+                    />
+                  </div>
                 </div>
                 
                 <div className="flex flex-col items-center">
-                  <div className="relative h-20 w-20 mb-2">
-                    <svg className="w-full h-full" viewBox="0 0 36 36">
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="rgba(245, 242, 237, 0.3)"
-                        strokeWidth="3"
+                  <div className="h-20 w-20 mb-2 relative flex items-center justify-center">
+                    <svg className="w-full h-full absolute" viewBox="0 0 100 100">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="none" 
+                        stroke="rgba(245, 242, 237, 0.3)" 
+                        strokeWidth="8"
                       />
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#f5f2ed"
-                        strokeWidth="3"
-                        strokeDasharray={`${calorieProgress}, 100`}
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="none" 
+                        stroke="#f5f2ed" 
+                        strokeWidth="8"
+                        strokeDasharray={`${calorieProgress * 2.51}, 251`}
+                        strokeLinecap="round"
+                        transform="rotate(-90 50 50)"
                       />
                     </svg>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <Flame size={24} className="mx-auto" />
-                      <span className="text-xs font-medium block">
-                        {nutritionLog?.calories || 0}/2500
-                      </span>
+                    <div className="flex flex-col items-center justify-center z-10">
+                      <Flame size={18} className="mb-1" />
+                      <div className="text-xs font-medium">
+                        {nutritionLog?.calories || 0}
+                        <span className="text-[10px] opacity-75 ml-0.5">cal</span>
+                      </div>
                     </div>
                   </div>
                   <span className="text-sm font-medium">Calories</span>
-                  <span className="text-xs">{calorieProgress.toFixed(0)}%</span>
+                  <div className="w-full mt-1">
+                    <Progress 
+                      value={calorieProgress} 
+                      className="h-1.5 bg-white/30" 
+                      indicatorColor="bg-white"
+                    />
+                  </div>
                 </div>
               </div>
               
