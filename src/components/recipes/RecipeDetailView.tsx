@@ -32,9 +32,9 @@ const RecipeDetailView: React.FC<RecipeDetailViewProps> = ({ recipe, onClose }) 
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
       <div className="app-container relative flex flex-col h-full max-h-full overflow-auto">
         <div className="p-4 pb-24 flex-1">
-          <div className="text-fuelup-text text-xl mb-4">fuelup.com</div>
+          <div className="text-fuelup-text text-xl font-medium mb-4">fuelup.com</div>
           
-          <h1 className="text-2xl text-fuelup-green mb-6 font-heading">{recipe.name}</h1>
+          <h1 className="text-2xl text-fuelup-green font-bold mb-6 font-heading">{recipe.name}</h1>
           
           <div className="bg-fuelup-green rounded-lg p-4 mb-6">
             <div className="aspect-video bg-white rounded-md flex items-center justify-center relative mb-4">
@@ -63,35 +63,35 @@ const RecipeDetailView: React.FC<RecipeDetailViewProps> = ({ recipe, onClose }) 
               <h2 className="text-xl mb-2 font-semibold">Ingredients:</h2>
               <ul className="list-disc pl-6 mb-4 space-y-1">
                 {recipe.ingredients.map((ingredient, idx) => (
-                  <li key={idx}>{ingredient}</li>
+                  <li key={idx} className="text-white text-base">{ingredient}</li>
                 ))}
               </ul>
               
               <h2 className="text-xl mb-2 font-semibold">Steps:</h2>
               <ol className="list-decimal pl-6 mb-4 space-y-1">
                 {recipe.instructions.map((step, idx) => (
-                  <li key={idx}>{step}</li>
+                  <li key={idx} className="text-white text-base">{step}</li>
                 ))}
               </ol>
               
               <div className="mt-6">
                 <h3 className="font-semibold mb-2">Nutrition Information:</h3>
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  <div className="bg-fuelup-bg/30 rounded p-2">
-                    <p className="font-bold">{recipe.nutritionInfo?.calories || recipe.calories}</p>
-                    <p className="text-xs">calories</p>
+                  <div className="bg-white/30 rounded p-2">
+                    <p className="font-bold text-white">{recipe.nutritionInfo?.calories || recipe.calories}</p>
+                    <p className="text-xs text-white">calories</p>
                   </div>
-                  <div className="bg-fuelup-bg/30 rounded p-2">
-                    <p className="font-bold">{recipe.nutritionInfo?.protein || recipe.protein}g</p>
-                    <p className="text-xs">protein</p>
+                  <div className="bg-white/30 rounded p-2">
+                    <p className="font-bold text-white">{recipe.nutritionInfo?.protein || recipe.protein}g</p>
+                    <p className="text-xs text-white">protein</p>
                   </div>
-                  <div className="bg-fuelup-bg/30 rounded p-2">
-                    <p className="font-bold">{recipe.nutritionInfo?.carbs || recipe.carbs}g</p>
-                    <p className="text-xs">carbs</p>
+                  <div className="bg-white/30 rounded p-2">
+                    <p className="font-bold text-white">{recipe.nutritionInfo?.carbs || recipe.carbs}g</p>
+                    <p className="text-xs text-white">carbs</p>
                   </div>
-                  <div className="bg-fuelup-bg/30 rounded p-2">
-                    <p className="font-bold">{recipe.nutritionInfo?.fat || recipe.fat}g</p>
-                    <p className="text-xs">fat</p>
+                  <div className="bg-white/30 rounded p-2">
+                    <p className="font-bold text-white">{recipe.nutritionInfo?.fat || recipe.fat}g</p>
+                    <p className="text-xs text-white">fat</p>
                   </div>
                 </div>
               </div>
@@ -100,14 +100,14 @@ const RecipeDetailView: React.FC<RecipeDetailViewProps> = ({ recipe, onClose }) 
           
           <div className="grid grid-cols-2 gap-4 mb-6">
             <button 
-              className="bg-fuelup-bg text-fuelup-green rounded-lg py-3 flex items-center justify-center"
+              className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
               onClick={onClose}
             >
               <ArrowLeft size={18} className="mr-2" />
               Back
             </button>
             <button 
-              className="bg-fuelup-bg text-fuelup-green rounded-lg py-3 flex items-center justify-center"
+              className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
               onClick={handleRate}
             >
               <Star size={18} className="mr-2" />
