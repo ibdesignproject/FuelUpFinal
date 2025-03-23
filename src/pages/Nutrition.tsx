@@ -2,14 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
-import { Plus, BarChart2, Droplet, Award } from 'lucide-react';
+import { Plus, BarChart2, Droplet, Award, Beef, Flame } from 'lucide-react';
 import { userProfileService, NutritionLog } from '@/services/userProfile';
 import { toast } from '@/components/ui/use-toast';
 
 const Nutrition = () => {
   const [nutritionLog, setNutritionLog] = useState<NutritionLog | null>(null);
   const [waterAmount, setWaterAmount] = useState<number>(250); // ml
+  const [proteinAmount, setProteinAmount] = useState<number>(20); // g
+  const [caloriesAmount, setCaloriesAmount] = useState<number>(250); // kcal
   const [showWaterInput, setShowWaterInput] = useState(false);
+  const [showProteinInput, setShowProteinInput] = useState(false);
+  const [showCaloriesInput, setShowCaloriesInput] = useState(false);
   
   // Calculate progress percentages
   const waterProgress = nutritionLog ? Math.min((nutritionLog.water / 2000) * 100, 100) : 0;
@@ -43,6 +47,72 @@ const Nutrition = () => {
     });
     
     setShowWaterInput(false);
+  };
+
+  const handleAddProtein = () => {
+    if (proteinAmount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid protein amount.",
+      });
+      return;
+    }
+    
+    // Create a simple meal structure for the protein
+    const proteinMeal = {
+      name: "Protein Intake",
+      calories: 0, // We're only tracking protein here
+      protein: proteinAmount,
+      carbs: 0,
+      fat: 0,
+      time: "snack"
+    };
+    
+    userProfileService.addMeal(proteinMeal);
+    
+    // Refresh log data
+    const updatedLog = userProfileService.getTodayNutritionLog();
+    setNutritionLog(updatedLog);
+    
+    toast({
+      title: "Protein Added",
+      description: `Added ${proteinAmount}g of protein to your log.`,
+    });
+    
+    setShowProteinInput(false);
+  };
+
+  const handleAddCalories = () => {
+    if (caloriesAmount <= 0) {
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid calorie amount.",
+      });
+      return;
+    }
+    
+    // Create a simple meal structure for the calories
+    const calorieMeal = {
+      name: "Calorie Intake",
+      calories: caloriesAmount,
+      protein: 0, // We're only tracking calories here
+      carbs: 0,
+      fat: 0,
+      time: "snack"
+    };
+    
+    userProfileService.addMeal(calorieMeal);
+    
+    // Refresh log data
+    const updatedLog = userProfileService.getTodayNutritionLog();
+    setNutritionLog(updatedLog);
+    
+    toast({
+      title: "Calories Added",
+      description: `Added ${caloriesAmount} calories to your log.`,
+    });
+    
+    setShowCaloriesInput(false);
   };
   
   return (
@@ -104,7 +174,7 @@ const Nutrition = () => {
                       />
                     </svg>
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <BarChart2 size={24} className="mx-auto" />
+                      <Beef size={24} className="mx-auto" />
                       <span className="text-xs font-medium block">
                         {nutritionLog?.protein || 0}/120g
                       </span>
@@ -132,19 +202,7 @@ const Nutrition = () => {
                       />
                     </svg>
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <svg 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        className="w-6 h-6 mx-auto"
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 2L4.5 20.29c-.63 1.8.56 3.71 2.47 3.71h10.06c1.91 0 3.1-1.91 2.47-3.71L12 2Z" />
-                        <path d="M12 6.5v5" />
-                        <path d="M12 18h.01" />
-                      </svg>
+                      <Flame size={24} className="mx-auto" />
                       <span className="text-xs font-medium block">
                         {nutritionLog?.calories || 0}/2500
                       </span>
@@ -209,6 +267,116 @@ const Nutrition = () => {
                   </div>
                 </div>
               )}
+
+              <div className="flex items-center justify-between p-3 bg-fuelup-green/30 rounded-lg mb-4">
+                <div className="flex items-center">
+                  <Beef size={20} className="mr-2" />
+                  <span>Add protein intake</span>
+                </div>
+                <button 
+                  className="bg-fuelup-green text-white p-1.5 rounded-full"
+                  onClick={() => setShowProteinInput(!showProteinInput)}
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+              
+              {showProteinInput && (
+                <div className="bg-fuelup-green/20 p-3 rounded-lg mb-4 animate-slide-in">
+                  <div className="flex gap-2 items-center">
+                    <div className="flex-1">
+                      <input
+                        type="number"
+                        value={proteinAmount}
+                        onChange={(e) => setProteinAmount(parseInt(e.target.value) || 0)}
+                        className="fuelup-input text-center"
+                        placeholder="Amount in grams"
+                      />
+                    </div>
+                    <button 
+                      className="bg-fuelup-green text-white py-2 px-4 rounded-lg"
+                      onClick={handleAddProtein}
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <div className="flex justify-between mt-3">
+                    <button 
+                      className="bg-fuelup-green/30 text-white py-1 px-3 rounded-lg text-sm"
+                      onClick={() => setProteinAmount(10)}
+                    >
+                      10g
+                    </button>
+                    <button 
+                      className="bg-fuelup-green/30 text-white py-1 px-3 rounded-lg text-sm"
+                      onClick={() => setProteinAmount(20)}
+                    >
+                      20g
+                    </button>
+                    <button 
+                      className="bg-fuelup-green/30 text-white py-1 px-3 rounded-lg text-sm"
+                      onClick={() => setProteinAmount(30)}
+                    >
+                      30g
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between p-3 bg-fuelup-green/30 rounded-lg mb-4">
+                <div className="flex items-center">
+                  <Flame size={20} className="mr-2" />
+                  <span>Add calorie intake</span>
+                </div>
+                <button 
+                  className="bg-fuelup-green text-white p-1.5 rounded-full"
+                  onClick={() => setShowCaloriesInput(!showCaloriesInput)}
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+              
+              {showCaloriesInput && (
+                <div className="bg-fuelup-green/20 p-3 rounded-lg mb-4 animate-slide-in">
+                  <div className="flex gap-2 items-center">
+                    <div className="flex-1">
+                      <input
+                        type="number"
+                        value={caloriesAmount}
+                        onChange={(e) => setCaloriesAmount(parseInt(e.target.value) || 0)}
+                        className="fuelup-input text-center"
+                        placeholder="Amount in calories"
+                      />
+                    </div>
+                    <button 
+                      className="bg-fuelup-green text-white py-2 px-4 rounded-lg"
+                      onClick={handleAddCalories}
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <div className="flex justify-between mt-3">
+                    <button 
+                      className="bg-fuelup-green/30 text-white py-1 px-3 rounded-lg text-sm"
+                      onClick={() => setCaloriesAmount(100)}
+                    >
+                      100 cal
+                    </button>
+                    <button 
+                      className="bg-fuelup-green/30 text-white py-1 px-3 rounded-lg text-sm"
+                      onClick={() => setCaloriesAmount(250)}
+                    >
+                      250 cal
+                    </button>
+                    <button 
+                      className="bg-fuelup-green/30 text-white py-1 px-3 rounded-lg text-sm"
+                      onClick={() => setCaloriesAmount(500)}
+                    >
+                      500 cal
+                    </button>
+                  </div>
+                </div>
+              )}
               
               <h3 className="text-lg mb-3 font-medium">Current Streaks</h3>
               
@@ -222,7 +390,7 @@ const Nutrition = () => {
                 </div>
                 
                 <div className="bg-fuelup-bg rounded-lg p-3 flex flex-col items-center">
-                  <BarChart2 size={24} className="mb-1 text-fuelup-green" />
+                  <Beef size={24} className="mb-1 text-fuelup-green" />
                   <span className="text-lg font-bold text-fuelup-green">
                     {userProfileService.getCurrentUser()?.streaks.protein || 0}
                   </span>
@@ -230,19 +398,7 @@ const Nutrition = () => {
                 </div>
                 
                 <div className="bg-fuelup-bg rounded-lg p-3 flex flex-col items-center">
-                  <svg 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    className="w-6 h-6 mb-1 text-fuelup-green"
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 2L4.5 20.29c-.63 1.8.56 3.71 2.47 3.71h10.06c1.91 0 3.1-1.91 2.47-3.71L12 2Z" />
-                    <path d="M12 6.5v5" />
-                    <path d="M12 18h.01" />
-                  </svg>
+                  <Flame size={24} className="mb-1 text-fuelup-green" />
                   <span className="text-lg font-bold text-fuelup-green">
                     {userProfileService.getCurrentUser()?.streaks.calories || 0}
                   </span>
