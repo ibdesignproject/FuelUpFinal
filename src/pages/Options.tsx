@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Calendar } from '@/components/ui/calendar';
@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from '@/components/ui/use-toast';
 
 const Options = () => {
   const [name, setName] = useState("");
@@ -16,21 +17,37 @@ const Options = () => {
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [sport, setSport] = useState("");
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Load saved data if available
     const savedData = localStorage.getItem('userFormData');
     if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      setName(parsedData.name || "");
-      setAge(parsedData.age || "");
-      setWeight(parsedData.weight || "");
-      setHeight(parsedData.height || "");
-      setSport(parsedData.sport || "");
-      if (parsedData.competitionDate) {
-        setDate(new Date(parsedData.competitionDate));
+      try {
+        const parsedData = JSON.parse(savedData);
+        setName(parsedData.name || "");
+        setAge(parsedData.age || "");
+        setWeight(parsedData.weight || "");
+        setHeight(parsedData.height || "");
+        setSport(parsedData.sport || "");
+        
+        // Safely parse the date string if it exists
+        if (parsedData.competitionDate && parsedData.competitionDate !== '') {
+          try {
+            setDate(parseISO(parsedData.competitionDate));
+          } catch (error) {
+            console.error("Error parsing date:", error);
+            // If parsing fails, don't set the date
+          }
+        }
+      } catch (error) {
+        console.error("Error loading saved data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load saved data.",
+          variant: "destructive"
+        });
       }
     }
   }, []);
@@ -38,18 +55,27 @@ const Options = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save to localStorage
-    const formData = {
-      name,
-      age,
-      weight,
-      height,
-      sport,
-      competitionDate: date ? format(date, 'PPP') : ''
-    };
-    
-    localStorage.setItem('userFormData', JSON.stringify(formData));
-    navigate('/profile');
+    try {
+      // Save to localStorage
+      const formData = {
+        name,
+        age,
+        weight,
+        height,
+        sport,
+        competitionDate: date ? date.toISOString() : ''
+      };
+      
+      localStorage.setItem('userFormData', JSON.stringify(formData));
+      navigate('/profile');
+    } catch (error) {
+      console.error("Error saving form data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save your data.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -128,7 +154,6 @@ const Options = () => {
                         selected={date}
                         onSelect={setDate}
                         initialFocus
-                        className="p-3 pointer-events-auto"
                       />
                     </PopoverContent>
                   </Popover>
