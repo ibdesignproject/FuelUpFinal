@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/common/PageTransition';
@@ -34,13 +33,11 @@ const MealGenerator = () => {
   const [newIngredient, setNewIngredient] = useState('');
   const navigate = useNavigate();
   
-  // Filter ingredients based on search term
   const filteredIngredients = ingredients.filter(ingredient => 
     ingredient.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   useEffect(() => {
-    // Check if user is logged in
     const currentUser = userProfileService.getCurrentUser();
     if (!currentUser) {
       toast({
@@ -52,12 +49,10 @@ const MealGenerator = () => {
     }
   }, [navigate]);
   
-  // Generate recipe recommendations based on selected ingredients
   const generateRecipes = async () => {
     setIsGenerating(true);
     
     try {
-      // Check if any ingredients are selected
       const hasSelectedIngredients = ingredients.some(ing => ing.selected);
       
       if (!hasSelectedIngredients) {
@@ -69,8 +64,13 @@ const MealGenerator = () => {
         return;
       }
       
-      // Get selected ingredients only
       const selectedIngredients = ingredients.filter(ing => ing.selected);
+      
+      toast({
+        title: "Generating Recipes",
+        description: `Creating recipes using ONLY ${selectedIngredients.map(ing => ing.name).join(', ')}`,
+      });
+      
       const recommendations = await recipeGenerator.getRecommendations(selectedIngredients);
       
       if (recommendations.length === 0) {
@@ -83,7 +83,7 @@ const MealGenerator = () => {
         setCurrentRecipeIndex(0);
         toast({
           title: "Recipes Generated",
-          description: `Found ${recommendations.length} recipes with your ingredients.`,
+          description: `Created ${recommendations.length} recipes with ONLY your selected ingredients.`,
         });
       }
     } catch (error) {
@@ -98,7 +98,6 @@ const MealGenerator = () => {
     }
   };
   
-  // Toggle ingredient selection
   const toggleIngredient = (index: number) => {
     const updatedIngredients = [...ingredients];
     updatedIngredients[index].selected = !updatedIngredients[index].selected;
@@ -110,7 +109,6 @@ const MealGenerator = () => {
     });
   };
   
-  // Add a new ingredient
   const addIngredient = () => {
     if (!newIngredient.trim()) {
       toast({
@@ -120,7 +118,6 @@ const MealGenerator = () => {
       return;
     }
     
-    // Check if ingredient already exists
     if (ingredients.some(ing => ing.name.toLowerCase() === newIngredient.toLowerCase())) {
       toast({
         title: "Ingredient Already Exists",
@@ -139,7 +136,6 @@ const MealGenerator = () => {
     });
   };
   
-  // Navigate through recipes
   const nextRecipe = () => {
     if (recipes.length === 0) return;
     setCurrentRecipeIndex((currentRecipeIndex + 1) % recipes.length);
@@ -150,7 +146,6 @@ const MealGenerator = () => {
     setCurrentRecipeIndex((currentRecipeIndex - 1 + recipes.length) % recipes.length);
   };
   
-  // Add current recipe to meal log
   const addRecipeToMealLog = () => {
     if (recipes.length === 0) return;
     
@@ -174,7 +169,6 @@ const MealGenerator = () => {
   
   const currentRecipe = recipes.length > 0 ? recipes[currentRecipeIndex] : null;
   
-  // Remove an ingredient
   const removeIngredient = (index: number) => {
     const updatedIngredients = [...ingredients];
     updatedIngredients.splice(index, 1);
@@ -209,6 +203,12 @@ const MealGenerator = () => {
               
               {showIngredients && (
                 <div className="p-4 pt-0">
+                  <div className="bg-white/95 p-3 rounded-md mb-4">
+                    <p className="text-fuelup-text text-sm font-medium">
+                      Select only the ingredients you have. AI will create recipes using STRICTLY ONLY your selected ingredients.
+                    </p>
+                  </div>
+                  
                   <div className="relative mb-4">
                     <input
                       type="text"
@@ -293,7 +293,7 @@ const MealGenerator = () => {
                 disabled={isGenerating}
                 className="bg-fuelup-green text-white hover:bg-fuelup-green/90 py-2 px-6 rounded-lg font-medium shadow-sm text-base"
               >
-                {isGenerating ? "Generating..." : "Generate Recipe Suggestions"}
+                {isGenerating ? "Generating..." : "Create Recipes With ONLY Selected Ingredients"}
               </Button>
             </div>
             

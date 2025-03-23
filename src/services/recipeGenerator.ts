@@ -193,7 +193,7 @@ const recipeDb: Recipe[] = [
   {
     id: '5',
     name: 'Tomato & Garlic Pasta',
-    image: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    image: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
     description: 'A simple, flavorful pasta dish that\'s quick to make',
     prepTime: 10,
     cookTime: 15,
@@ -363,168 +363,129 @@ class MealPlannerModel {
   
   // This would predict which recipes are most suitable
   async predictRecipes(input: GeneratorInput): Promise<Recipe[]> {
-    // In a real implementation, we would:
-    // 1. Process the input to create model features
-    // 2. Run the prediction
-    // 3. Map prediction results to recipe IDs
-    
     console.log("Generating recipes with parameters:", input);
     
-    // Mock filtering based on inputs
-    let filteredRecipes = [...recipeDb];
+    // CRITICAL: The user has ONLY the selected ingredients and nothing else
+    if (!input.ingredients || input.ingredients.length === 0) {
+      console.log("No ingredients selected, returning empty recipe list");
+      return [];
+    }
     
-    // STRICT FILTERING: Only include recipes where ALL ingredients are from the selected list
-    if (input.ingredients && input.ingredients.length > 0) {
-      filteredRecipes = filteredRecipes.filter(recipe => {
-        // First, check if at least one of the selected ingredients is used in the recipe
-        const hasAtLeastOneSelectedIngredient = recipe.ingredients.some(recipeIng => {
-          return input.ingredients!.some(selectedIng => {
-            const selectedIngLower = selectedIng.toLowerCase();
-            return recipeIng.toLowerCase().includes(selectedIngLower);
-          });
-        });
-        
-        if (!hasAtLeastOneSelectedIngredient) return false;
-        
-        // Now generate an on-the-fly recipe variation based on selected ingredients
-        // This simulates AI generating a new recipe using only the selected ingredients
-        const selectedIngredientsLower = input.ingredients!.map(ing => ing.toLowerCase());
-        
-        // Create a modified recipe that only uses the selected ingredients
-        const newRecipe = { ...recipe };
-        newRecipe.id = recipe.id + "-custom";
-        newRecipe.name = "Custom " + recipe.name;
-        newRecipe.description = "A custom recipe created just for you with your selected ingredients";
-        
-        // Keep only ingredients that match the selected ones
-        const customIngredients = recipe.ingredients.filter(ing => {
-          return selectedIngredientsLower.some(selected => ing.toLowerCase().includes(selected));
-        });
-        
-        // If we don't have enough matching ingredients, add some generic quantities of the selected ones
-        if (customIngredients.length < input.ingredients!.length) {
-          input.ingredients!.forEach(selected => {
-            const alreadyIncluded = customIngredients.some(ing => ing.toLowerCase().includes(selected.toLowerCase()));
-            if (!alreadyIncluded) {
-              customIngredients.push(`1 ${selected.toLowerCase()}`);
-            }
-          });
-        }
-        
-        newRecipe.ingredients = customIngredients;
-        
-        // Adjust instructions based on available ingredients
-        newRecipe.instructions = recipe.instructions.filter(instruction => {
-          return customIngredients.some(ing => {
-            const ingredientName = ing.split(' ').slice(1).join(' ').toLowerCase();
-            return instruction.toLowerCase().includes(ingredientName);
-          });
-        });
-        
-        // If we filtered out too many instructions, add some generic ones
-        if (newRecipe.instructions.length < 3) {
-          newRecipe.instructions = [
-            `Prepare all the ingredients: ${customIngredients.join(', ')}`,
-            "Mix all ingredients together in a bowl",
-            "Cook according to your preference",
-            "Serve and enjoy your custom dish!"
-          ];
-        }
-        
-        // Replace the original recipe with our custom variation
-        filteredRecipes[filteredRecipes.indexOf(recipe)] = newRecipe;
-        
-        return true;
+    console.log("User has ONLY these ingredients:", input.ingredients);
+    
+    // First, try to find recipes that use ONLY the selected ingredients
+    // We'll create custom recipes based solely on the provided ingredients
+    
+    // Generate a completely new recipe using ONLY the selected ingredients
+    const generateNewRecipeFromIngredients = (ingredients: string[]): Recipe => {
+      // Capitalize first letter of each ingredient for recipe name
+      const formatIngName = (ing: string) => ing.charAt(0).toUpperCase() + ing.slice(1).toLowerCase();
+      
+      // Get up to 2 ingredients for the name
+      const nameIngredients = ingredients.slice(0, 2).map(formatIngName);
+      const recipeName = nameIngredients.join(' & ') + (ingredients.length > 2 ? ' Delight' : ' Special');
+      
+      // Generate simple instructions based only on these ingredients
+      const instructions = [
+        `Gather your ingredients: ${ingredients.join(', ')}.`,
+        `Prepare the ${ingredients[0]} by washing and cutting into bite-sized pieces.`,
+      ];
+      
+      // Add ingredient-specific instructions
+      ingredients.forEach((ing, index) => {
+        if (index === 0) return; // Skip first ingredient as it's already handled
+        instructions.push(`Add the ${ing} and combine with the ${ingredients[0]}.`);
       });
-    }
-    
-    // Filter by dietary restrictions
-    if (input.dietary && input.dietary.length > 0) {
-      // This would be more sophisticated in a real app
-      // Here we just check if any tags match the dietary restrictions
-      filteredRecipes = filteredRecipes.filter(recipe => 
-        input.dietary!.some(diet => 
-          recipe.tags.some(tag => tag.toLowerCase().includes(diet.toLowerCase()))
-        )
-      );
-    }
-    
-    // Filter by meal type
-    if (input.mealType) {
-      filteredRecipes = filteredRecipes.filter(recipe => 
-        recipe.tags.some(tag => tag.toLowerCase() === input.mealType!.toLowerCase())
-      );
-    }
-    
-    // Filter by calorie range
-    if (input.calories) {
-      filteredRecipes = filteredRecipes.filter(recipe => 
-        recipe.calories >= input.calories!.min && 
-        recipe.calories <= input.calories!.max
-      );
-    }
-    
-    // Filter by protein range
-    if (input.protein) {
-      filteredRecipes = filteredRecipes.filter(recipe => 
-        recipe.protein >= input.protein!.min && 
-        recipe.protein <= input.protein!.max
-      );
-    }
-    
-    // Filter by prep time
-    if (input.prepTime) {
-      filteredRecipes = filteredRecipes.filter(recipe => 
-        recipe.prepTime <= input.prepTime!
-      );
-    }
-    
-    // If no recipes match the filters, generate a completely new recipe with the selected ingredients
-    if (filteredRecipes.length === 0) {
-      console.log("No matching recipes found. Generating a new recipe with selected ingredients");
       
-      if (input.ingredients && input.ingredients.length > 0) {
-        const newRecipe: Recipe = {
-          id: "generated-" + Date.now(),
-          name: `${input.ingredients[0]} ${input.ingredients.length > 1 ? '& ' + input.ingredients[1] : ''} Special`,
-          image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
-          description: `A custom recipe created just for you using ${input.ingredients.join(', ')}`,
-          prepTime: 15,
-          cookTime: 20,
-          calories: 350,
-          protein: 15,
-          carbs: 40,
-          fat: 10,
-          ingredients: input.ingredients.map(ing => `1 ${ing}`),
-          instructions: [
-            `Prepare all your ingredients: ${input.ingredients.join(', ')}`,
-            "Combine all ingredients in a bowl and mix well",
-            "Season to taste with salt and pepper",
-            "Cook in a pan over medium heat for 10 minutes, stirring occasionally",
-            "Serve hot and enjoy your custom dish!"
-          ],
-          tags: ["custom", "quick", ...input.ingredients],
-          nutritionInfo: {
-            calories: 350,
-            protein: 15, 
-            carbs: 40,
-            fat: 10
-          }
-        };
-        
-        return [newRecipe];
-      }
+      // Add finishing instructions
+      instructions.push("Season with salt and pepper to taste.");
+      instructions.push(`Serve your ${recipeName} fresh and enjoy!`);
       
-      // If no ingredients provided, return a random selection
-      const randomRecipes = [];
-      for (let i = 0; i < 3 && i < recipeDb.length; i++) {
-        const randomIndex = Math.floor(Math.random() * recipeDb.length);
-        randomRecipes.push(recipeDb[randomIndex]);
-      }
-      return randomRecipes;
+      // Generate nutrition values based on number of ingredients
+      const baseCalories = 150 + (ingredients.length * 20);
+      const baseProtein = 5 + (ingredients.length * 2);
+      const baseCarbs = 15 + (ingredients.length * 3);
+      const baseFat = 7 + (ingredients.length);
+      
+      return {
+        id: "strict-custom-" + Date.now(),
+        name: recipeName,
+        image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
+        description: `A custom recipe created just for you using only ${ingredients.join(', ')}. Nothing else needed!`,
+        prepTime: 10,
+        cookTime: 15,
+        calories: baseCalories,
+        protein: baseProtein,
+        carbs: baseCarbs,
+        fat: baseFat,
+        ingredients: ingredients.map(ing => `${ing}`),
+        instructions: instructions,
+        tags: ["custom", "quick", ...ingredients],
+        nutritionInfo: {
+          calories: baseCalories,
+          protein: baseProtein,
+          carbs: baseCarbs,
+          fat: baseFat
+        }
+      };
+    };
+    
+    // Generate 3 different variations of recipes using ONLY the provided ingredients
+    const recipes: Recipe[] = [];
+    
+    // Recipe 1: Basic combination
+    recipes.push(generateNewRecipeFromIngredients(input.ingredients));
+    
+    // Recipe 2: Different preparation style
+    if (input.ingredients.length > 1) {
+      const recipe2 = generateNewRecipeFromIngredients(input.ingredients);
+      recipe2.id = "strict-custom-" + (Date.now() + 1);
+      recipe2.name = input.ingredients[0] + " " + input.ingredients[1] + " Medley";
+      recipe2.description = `A different preparation using only your selected ingredients: ${input.ingredients.join(', ')}`;
+      
+      // Different instructions
+      recipe2.instructions = [
+        `Start with all your ingredients: ${input.ingredients.join(', ')}.`,
+        `Finely dice the ${input.ingredients[0]}.`
+      ];
+      
+      input.ingredients.slice(1).forEach(ing => {
+        recipe2.instructions.push(`Slice the ${ing} thinly and set aside.`);
+      });
+      
+      recipe2.instructions.push(`Combine all prepared ingredients in a bowl.`);
+      recipe2.instructions.push(`Mix well and let sit for 5 minutes to blend flavors.`);
+      recipe2.instructions.push(`Serve your ${recipe2.name} chilled or at room temperature.`);
+      
+      recipes.push(recipe2);
     }
     
-    return filteredRecipes;
+    // Recipe 3: Cooked version if more than 2 ingredients
+    if (input.ingredients.length >= 2) {
+      const recipe3 = generateNewRecipeFromIngredients(input.ingredients);
+      recipe3.id = "strict-custom-" + (Date.now() + 2);
+      recipe3.name = "Sautéed " + recipe3.name;
+      recipe3.description = `A hot, cooked dish using only ${input.ingredients.join(' and ')}.`;
+      
+      // Different instructions for cooking
+      recipe3.instructions = [
+        `Prepare all ingredients: ${input.ingredients.join(', ')}.`,
+        `Heat a pan over medium heat.`,
+        `Add a small amount of water to the pan (if needed for cooking).`
+      ];
+      
+      input.ingredients.forEach(ing => {
+        recipe3.instructions.push(`Add the ${ing} to the pan and cook for 2-3 minutes.`);
+      });
+      
+      recipe3.instructions.push(`Stir occasionally until everything is cooked through.`);
+      recipe3.instructions.push(`Serve your ${recipe3.name} hot.`);
+      
+      recipes.push(recipe3);
+    }
+    
+    console.log(`Generated ${recipes.length} recipes using ONLY the selected ingredients`);
+    return recipes;
   }
 }
 
@@ -535,7 +496,7 @@ export const generateRecipesBasedOnPreferences = async (input: GeneratorInput): 
     return await model.predictRecipes(input);
   } catch (error) {
     console.error("Error generating recipes:", error);
-    return recipeDb.slice(0, 3); // Fallback to returning the first 3 recipes
+    return []; // Return empty array instead of fallbacks
   }
 };
 
@@ -571,7 +532,8 @@ export const getRecommendations = async (ingredients: (Ingredient | string)[]): 
       return ing.name;
     });
   
-  console.log("Generating recipes with ONLY these ingredients:", ingredientNames);
+  console.log("Generating recipes with STRICTLY ONLY these ingredients:", ingredientNames);
+  console.log("IMPORTANT: We assume the user has NO OTHER ingredients available");
   
   return generateRecipesBasedOnPreferences({
     ingredients: ingredientNames
@@ -585,4 +547,3 @@ export const recipeGenerator = {
   getRecipeById,
   getRecommendations
 };
-
