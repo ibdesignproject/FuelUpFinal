@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/common/PageTransition';
@@ -15,22 +16,50 @@ interface Ingredient {
 
 const MealGenerator = () => {
   const [ingredients, setIngredients] = useState<Ingredient[]>([
+    // Vegetables
     { name: "Tomato", selected: false }, 
     { name: "Potato", selected: false }, 
     { name: "Garlic", selected: false }, 
-    { name: "Onion", selected: false }, 
+    { name: "Onion", selected: false },
+    { name: "Carrot", selected: false },
+    { name: "Spinach", selected: false },
+    { name: "Broccoli", selected: false },
+    { name: "Bell Pepper", selected: false },
+    { name: "Cauliflower", selected: false },
+    { name: "Mushroom", selected: false },
+    { name: "Eggplant", selected: false },
+    { name: "Zucchini", selected: false },
+    // Fruits
     { name: "Apple", selected: false }, 
     { name: "Lime", selected: false },
     { name: "Lemon", selected: false }, 
     { name: "Orange", selected: false }, 
-    { name: "Cucumber", selected: false }
+    { name: "Cucumber", selected: false },
+    { name: "Banana", selected: false },
+    { name: "Avocado", selected: false },
+    // Protein
+    { name: "Chicken", selected: false },
+    { name: "Beef", selected: false },
+    { name: "Pork", selected: false },
+    { name: "Fish", selected: false },
+    { name: "Eggs", selected: false },
+    { name: "Tofu", selected: false },
+    // Staples
+    { name: "Rice", selected: false },
+    { name: "Pasta", selected: false },
+    { name: "Bread", selected: false },
+    { name: "Flour", selected: false },
+    { name: "Milk", selected: false },
+    { name: "Cheese", selected: false },
+    { name: "Yogurt", selected: false },
+    { name: "Butter", selected: false },
+    { name: "Oil", selected: false }
   ]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
   const [showIngredients, setShowIngredients] = useState(true);
-  const [newIngredient, setNewIngredient] = useState('');
   const navigate = useNavigate();
   
   const filteredIngredients = ingredients.filter(ingredient => 
@@ -109,33 +138,6 @@ const MealGenerator = () => {
     });
   };
   
-  const addIngredient = () => {
-    if (!newIngredient.trim()) {
-      toast({
-        title: "Empty Ingredient",
-        description: "Please enter an ingredient name.",
-      });
-      return;
-    }
-    
-    if (ingredients.some(ing => ing.name.toLowerCase() === newIngredient.toLowerCase())) {
-      toast({
-        title: "Ingredient Already Exists",
-        description: "This ingredient is already in your list.",
-      });
-      return;
-    }
-    
-    const newIngredientObj = { name: newIngredient, selected: true };
-    setIngredients([...ingredients, newIngredientObj]);
-    setNewIngredient('');
-    
-    toast({
-      title: "Ingredient Added",
-      description: `${newIngredient} has been added to your ingredients.`,
-    });
-  };
-  
   const nextRecipe = () => {
     if (recipes.length === 0) return;
     setCurrentRecipeIndex((currentRecipeIndex + 1) % recipes.length);
@@ -203,12 +205,6 @@ const MealGenerator = () => {
               
               {showIngredients && (
                 <div className="p-4 pt-0">
-                  <div className="bg-white/95 p-3 rounded-md mb-4">
-                    <p className="text-fuelup-text text-sm font-medium">
-                      Select only the ingredients you have. AI will create recipes using STRICTLY ONLY your selected ingredients.
-                    </p>
-                  </div>
-                  
                   <div className="relative mb-4">
                     <input
                       type="text"
@@ -266,23 +262,6 @@ const MealGenerator = () => {
                       )}
                     </div>
                   </div>
-                  
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Add new ingredient..."
-                      value={newIngredient}
-                      onChange={(e) => setNewIngredient(e.target.value)}
-                      className="fuelup-input bg-white flex-1 text-fuelup-text"
-                      onKeyDown={(e) => e.key === 'Enter' && addIngredient()}
-                    />
-                    <button 
-                      className="bg-white text-fuelup-green py-0 px-4 rounded-md font-medium hover:bg-white/90"
-                      onClick={addIngredient}
-                    >
-                      Add
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -293,7 +272,7 @@ const MealGenerator = () => {
                 disabled={isGenerating}
                 className="bg-fuelup-green text-white hover:bg-fuelup-green/90 py-2 px-6 rounded-lg font-medium shadow-sm text-base"
               >
-                {isGenerating ? "Generating..." : "Create Recipes With ONLY Selected Ingredients"}
+                {isGenerating ? "Generating..." : "Generate Recipes"}
               </Button>
             </div>
             
