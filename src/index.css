@@ -16,24 +16,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 60 6% 26%;
 
-    --primary: 80 30% 75%;
+    --primary: 70 30% 70%;
     --primary-foreground: 60 6% 26%;
 
-    --secondary: 80 30% 85%;
+    --secondary: 70 30% 85%;
     --secondary-foreground: 60 6% 26%;
 
-    --muted: 80 30% 90%;
+    --muted: 60 5% 90%;
     --muted-foreground: 60 6% 40%;
 
-    --accent: 80 30% 80%;
+    --accent: 70 30% 80%;
     --accent-foreground: 60 6% 26%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 60 6% 96%;
 
-    --border: 80 30% 80%;
-    --input: 80 30% 80%;
-    --ring: 80 30% 70%;
+    --border: 70 30% 80%;
+    --input: 70 30% 80%;
+    --ring: 70 30% 70%;
 
     --radius: 0.5rem;
   }
@@ -43,10 +43,41 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-fuelup-bg text-fuelup-darktext font-sans;
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
+    position: relative;
+  }
+
+  /* Add phone outline styling */
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 10px solid #000;
+    border-radius: 40px;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Notch styling */
+  body::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 25px;
+    background-color: #000;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 1001;
+    pointer-events: none;
   }
 
   input, button, textarea, select {
@@ -61,22 +92,25 @@
   margin: 0 auto;
   overflow: hidden;
   position: relative;
-  background-color: hsl(var(--background));
+  background-color: #f5f2ed;
+  box-sizing: border-box;
+  padding-top: 30px;
 }
 
 .bottom-nav {
   position: fixed;
-  bottom: 0;
+  bottom: 10px;
   left: 0;
   right: 0;
-  max-width: 430px;
+  max-width: 380px;
   margin: 0 auto;
   height: 60px;
-  background-color: hsl(var(--primary));
+  background-color: transparent;
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 50;
+  padding: 0 20px;
 }
 
 .nav-item {
@@ -86,14 +120,70 @@
   justify-content: center;
   flex: 1;
   height: 100%;
-  color: hsl(var(--primary-foreground));
+  background-color: #f5f2ed;
+  border: 1px solid #bbc093;
+  border-radius: 8px;
+  color: #8a8a8a;
+  padding: 8px;
+  margin: 0 5px;
 }
 
 .nav-item.active {
+  background-color: #bbc093;
   color: white;
 }
 
 .page-content {
-  padding-bottom: 80px; /* Space for bottom navigation */
+  padding-bottom: 80px;
   min-height: 100vh;
+}
+
+/* Custom FuelUp styles */
+.fuelup-input {
+  background-color: #f5f2ed;
+  border: 1px solid #bbc093;
+  border-radius: 8px;
+  height: 45px;
+  width: 100%;
+  padding: 0 12px;
+  color: #666666;
+  text-align: center;
+}
+
+.fuelup-button {
+  background-color: #bbc093;
+  border-radius: 8px;
+  height: 45px;
+  color: #f5f2ed;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fuelup-card {
+  background-color: #bbc093;
+  border-radius: 8px;
+  padding: 15px;
+  color: #f5f2ed;
+}
+
+.fuelup-container {
+  background-color: #bbc093;
+  border-radius: 8px;
+  padding: 20px;
+  color: #f5f2ed;
+}
+
+.fuelup-header {
+  font-size: 24px;
+  color: #bbc093;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.fuelup-label {
+  color: #bbc093;
+  font-size: 16px;
+  margin-bottom: 8px;
 }

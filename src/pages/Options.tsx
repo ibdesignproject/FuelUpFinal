@@ -2,12 +2,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/common/PageTransition';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import BottomNavigation from '@/components/layout/BottomNavigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Options = () => {
-  const [selectedOption, setSelectedOption] = useState("");
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [sport, setSport] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -15,53 +18,103 @@ const Options = () => {
     navigate('/profile');
   };
 
-  const options = [
-    "Option 1",
-    "Option 2",
-    "Option 3",
-    "Option 4",
-    "Option 5",
-    "Option 6"
-  ];
+  // Calendar days
+  const days = Array.from({ length: 28 }, (_, i) => i + 1);
+  const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   return (
     <PageTransition>
       <div className="app-container">
-        <div className="page-content flex flex-col min-h-screen bg-background">
+        <div className="page-content flex flex-col min-h-screen">
           <div className="flex-1 p-4">
             <div className="mt-8 mb-6">
-              <h1 className="text-xl font-semibold">Get to know you!</h1>
+              <div className="text-fuelup-text text-xl">fuelup.com</div>
+              <h1 className="text-fuelup-green text-2xl mt-4">Let's get to know you!</h1>
             </div>
             
-            <div className="space-y-2 mb-6">
-              <p className="text-muted-foreground">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <RadioGroup value={selectedOption} onValueChange={setSelectedOption} className="space-y-4">
-                {options.map((option, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <RadioGroupItem 
-                      value={option} 
-                      id={`option-${index}`} 
-                      className="border-primary"
-                    />
-                    <Label htmlFor={`option-${index}`} className="text-foreground">{option}</Label>
-                  </div>
-                ))}
-              </RadioGroup>
+            <div className="fuelup-container mt-4">
+              <h2 className="text-xl mb-4">Kindly enter the following information:</h2>
               
-              <div className="flex justify-center mt-8">
-                <button 
-                  type="submit" 
-                  className="bg-primary text-primary-foreground px-4 py-2 rounded w-[120px] h-[40px]"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="fuelup-input bg-fuelup-bg"
+                />
+                
+                <input
+                  type="number"
+                  placeholder="Age"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="fuelup-input bg-fuelup-bg"
+                />
+                
+                <input
+                  type="text"
+                  placeholder="Weight"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  className="fuelup-input bg-fuelup-bg"
+                />
+                
+                <input
+                  type="text"
+                  placeholder="Height"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                  className="fuelup-input bg-fuelup-bg"
+                />
+                
+                <input
+                  type="text"
+                  placeholder="Sport you play"
+                  value={sport}
+                  onChange={(e) => setSport(e.target.value)}
+                  className="fuelup-input bg-fuelup-bg"
+                />
+                
+                <div className="mt-4">
+                  <p className="text-lg mb-2">Date of next competition:</p>
+                  
+                  <div className="bg-fuelup-bg rounded-lg p-3 mb-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <ChevronLeft className="text-fuelup-green" />
+                      <span className="text-fuelup-green">February 2017</span>
+                      <ChevronRight className="text-fuelup-green" />
+                    </div>
+                    
+                    <div className="grid grid-cols-7 gap-1">
+                      {weekdays.map((day, index) => (
+                        <div key={`weekday-${index}`} className="text-center text-fuelup-green">
+                          {day}
+                        </div>
+                      ))}
+                      
+                      {days.map((day) => (
+                        <div 
+                          key={`day-${day}`} 
+                          className="text-center text-fuelup-green py-1"
+                        >
+                          {day}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex justify-end">
+                  <button 
+                    type="submit" 
+                    className="bg-fuelup-bg text-fuelup-green px-6 py-2 rounded-lg"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
           
           <BottomNavigation />

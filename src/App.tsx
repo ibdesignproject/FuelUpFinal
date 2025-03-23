@@ -24,9 +24,11 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/options" element={<Options />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/create" element={<MealGenerator />} />
+          <Route path="/browse" element={<MealBrowsing />} />
+          <Route path="/nutrition" element={<Nutrition />} />
           <Route path="/meal-generator" element={<MealGenerator />} />
           <Route path="/meal-browsing" element={<MealBrowsing />} />
-          <Route path="/nutrition" element={<Nutrition />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
