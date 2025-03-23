@@ -1,4 +1,3 @@
-
 import * as tf from '@tensorflow/tfjs';
 
 export interface Recipe {
@@ -307,7 +306,7 @@ export const getRecipeById = (id: string): Recipe | undefined => {
 };
 
 // Define the Ingredient type more clearly
-interface Ingredient {
+export interface Ingredient {
   name: string;
   selected: boolean;
 }
@@ -318,9 +317,14 @@ export const getRecommendations = async (ingredients: (Ingredient | string)[]): 
   const ingredientNames = ingredients
     .filter((ing): ing is Ingredient | string => 
       typeof ing === 'object' ? ing !== null && 'selected' in ing && ing.selected : true)
-    .map(ing => 
-      typeof ing === 'string' ? ing : ing.name
-    );
+    .map(ing => {
+      // This explicit type checking helps TypeScript understand the structure
+      if (typeof ing === 'string') {
+        return ing;
+      } else {
+        return ing.name;
+      }
+    });
   
   return generateRecipesBasedOnPreferences({
     ingredients: ingredientNames
