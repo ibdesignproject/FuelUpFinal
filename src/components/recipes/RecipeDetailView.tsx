@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, ArrowLeft, Heart, StarHalf, StarOff } from 'lucide-react';
@@ -5,6 +6,8 @@ import { Recipe } from '@/services/recipeGenerator';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { toast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface RecipeDetailViewProps {
   recipe: Recipe;
@@ -61,12 +64,30 @@ const RecipeDetailView: React.FC<RecipeDetailViewProps> = ({ recipe, onClose }) 
   };
   
   const renderStar = (position: number, filled: number) => {
-    if (filled >= position) {
-      return <Star size={24} className="text-yellow-400 fill-yellow-400" />;
-    } else if (filled >= position - 0.5) {
-      return <StarHalf size={24} className="text-yellow-400 fill-yellow-400" />;
+    const isActive = filled >= position;
+    const isHalfStar = !isActive && filled >= position - 0.5;
+    
+    if (isActive) {
+      return (
+        <Star 
+          size={28} 
+          className="text-yellow-400 fill-yellow-400 transition-all transform hover:scale-110" 
+        />
+      );
+    } else if (isHalfStar) {
+      return (
+        <StarHalf 
+          size={28} 
+          className="text-yellow-400 fill-yellow-400 transition-all transform hover:scale-110" 
+        />
+      );
     } else {
-      return <StarOff size={24} className="text-gray-300" />;
+      return (
+        <StarOff 
+          size={28} 
+          className="text-gray-300 hover:text-gray-400 transition-all transform hover:scale-110" 
+        />
+      );
     }
   };
   
@@ -139,74 +160,92 @@ const RecipeDetailView: React.FC<RecipeDetailViewProps> = ({ recipe, onClose }) 
           </div>
           
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <button 
+            <Button 
+              variant="default"
               className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
               onClick={onClose}
             >
               <ArrowLeft size={18} className="mr-2" />
               Back
-            </button>
-            <button 
+            </Button>
+            <Button 
+              variant="default"
               className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
               onClick={handleRate}
             >
-              <Star size={18} className="mr-2" />
+              <Star size={18} className="mr-2 fill-yellow-400" />
               Rate
-            </button>
+            </Button>
           </div>
         </div>
         
-        {showRatingModal && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <Card className="w-[90%] max-w-md">
-              <CardHeader>
-                <h2 className="text-xl font-bold text-center">Rate This Recipe</h2>
-                <p className="text-center text-muted-foreground">How would you rate {recipe.name}?</p>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center space-x-2 my-4">
-                  {[1, 2, 3, 4, 5].map((rating) => (
-                    <button
-                      key={rating}
-                      className="focus:outline-none transition-transform hover:scale-110"
-                      onClick={() => setSelectedRating(rating)}
-                      onMouseEnter={() => setHoveredRating(rating)}
-                      onMouseLeave={() => setHoveredRating(0)}
-                    >
-                      {renderStar(
-                        rating,
-                        hoveredRating > 0 ? hoveredRating : selectedRating
-                      )}
-                    </button>
-                  ))}
-                </div>
-                
-                <p className="text-center font-medium mt-2">
+        <Dialog open={showRatingModal} onOpenChange={setShowRatingModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-center">Rate This Recipe</DialogTitle>
+              <DialogDescription className="text-center">
+                How would you rate <span className="font-medium">{recipe.name}</span>?
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="py-6">
+              <div className="flex justify-center space-x-2 my-4">
+                {[1, 2, 3, 4, 5].map((rating) => (
+                  <button
+                    key={rating}
+                    className="focus:outline-none transition-transform p-1"
+                    onClick={() => setSelectedRating(rating)}
+                    onMouseEnter={() => setHoveredRating(rating)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                  >
+                    {renderStar(
+                      rating,
+                      hoveredRating > 0 ? hoveredRating : selectedRating
+                    )}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="text-center mt-4">
+                <p className="font-medium text-lg">
+                  {selectedRating === 0 && "Select a rating"}
                   {selectedRating === 1 && "Poor"}
                   {selectedRating === 2 && "Fair"}
                   {selectedRating === 3 && "Good"}
                   {selectedRating === 4 && "Very Good"}
                   {selectedRating === 5 && "Excellent"}
                 </p>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <button 
-                  className="px-4 py-2 rounded-md border border-gray-300"
-                  onClick={() => setShowRatingModal(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  className={`px-4 py-2 rounded-md bg-fuelup-green text-white ${!selectedRating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onClick={submitRating}
-                  disabled={!selectedRating}
-                >
-                  Submit Rating
-                </button>
-              </CardFooter>
-            </Card>
-          </div>
-        )}
+                
+                {selectedRating > 0 && (
+                  <p className="text-gray-500 text-sm mt-1">
+                    {selectedRating === 1 && "I didn't enjoy this recipe at all."}
+                    {selectedRating === 2 && "This recipe needs improvement."}
+                    {selectedRating === 3 && "This recipe was satisfactory."}
+                    {selectedRating === 4 && "I really enjoyed this recipe!"}
+                    {selectedRating === 5 && "This recipe was absolutely perfect!"}
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            <DialogFooter className="sm:justify-between">
+              <Button
+                variant="outline"
+                onClick={() => setShowRatingModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                className={`bg-fuelup-green text-white ${!selectedRating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={submitRating}
+                disabled={!selectedRating}
+              >
+                Submit Rating
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         
         <BottomNavigation />
       </div>
