@@ -144,7 +144,13 @@ class UserProfileService {
   }
   
   public logout(): void {
-    // In a real app, we would clear session tokens
+    // Clear current user
+    this.currentUser = null;
+    
+    // Clear localStorage items
+    localStorage.removeItem('userProfile');
+    localStorage.removeItem('nutritionLogs');
+    
     toast({
       title: "Logged out",
       description: "You have been logged out successfully.",

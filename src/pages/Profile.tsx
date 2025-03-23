@@ -33,13 +33,20 @@ const Profile = () => {
   ]);
 
   useEffect(() => {
+    // Check if user is logged in
+    const currentUser = userProfileService.getCurrentUser();
+    if (!currentUser) {
+      // Redirect to login if not logged in
+      navigate('/');
+      return;
+    }
+    
     // Load user data from localStorage
     const savedData = localStorage.getItem('userFormData');
     if (savedData) {
       setUserData(JSON.parse(savedData));
     } else {
       // If no data in localStorage, use the current user from service
-      const currentUser = userProfileService.getCurrentUser();
       if (currentUser) {
         setUserData({
           name: currentUser.name || '',
@@ -57,7 +64,7 @@ const Profile = () => {
     if (savedGoals) {
       setGoals(JSON.parse(savedGoals));
     }
-  }, []);
+  }, [navigate]);
   
   // Save goals to localStorage whenever they change
   useEffect(() => {
@@ -66,10 +73,18 @@ const Profile = () => {
 
   const handleLogout = () => {
     userProfileService.logout();
+    
+    // Clear any user-related data from localStorage
+    localStorage.removeItem('userFormData');
+    localStorage.removeItem('userGoals');
+    localStorage.removeItem('phoneNumber');
+    
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of your account.",
     });
+    
+    // Navigate back to login page
     navigate('/');
   };
   
