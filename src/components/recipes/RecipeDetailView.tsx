@@ -94,11 +94,33 @@ const RecipeDetailView: React.FC<RecipeDetailViewProps> = ({ recipe, onClose }) 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
       <div className="app-container relative flex flex-col h-full max-h-full overflow-auto">
-        <div className="p-4 pb-24 flex-1">
-          <div className="text-fuelup-text text-xl font-medium mb-4">fuelup.com</div>
+        {/* Header and Navigation */}
+        <div className="sticky top-0 bg-white z-10 p-4 border-b">
+          <div className="text-fuelup-text text-xl font-medium mb-2">fuelup.com</div>
+          <h1 className="text-2xl text-fuelup-green font-bold font-heading">{recipe.name}</h1>
           
-          <h1 className="text-2xl text-fuelup-green font-bold mb-6 font-heading">{recipe.name}</h1>
-          
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <Button 
+              variant="default"
+              className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
+              onClick={onClose}
+            >
+              <ArrowLeft size={18} className="mr-2" />
+              Back
+            </Button>
+            <Button 
+              variant="default"
+              className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
+              onClick={handleRate}
+            >
+              <Star size={18} className="mr-2 fill-yellow-400" />
+              Rate
+            </Button>
+          </div>
+        </div>
+        
+        {/* Main Content - Scrollable */}
+        <div className="p-4 pb-24 flex-1 overflow-auto">
           <div className="bg-fuelup-green rounded-lg p-4 mb-6">
             <div className="aspect-video bg-white rounded-md flex items-center justify-center relative mb-4">
               <img 
@@ -157,25 +179,6 @@ const RecipeDetailView: React.FC<RecipeDetailViewProps> = ({ recipe, onClose }) 
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <Button 
-              variant="default"
-              className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
-              onClick={onClose}
-            >
-              <ArrowLeft size={18} className="mr-2" />
-              Back
-            </Button>
-            <Button 
-              variant="default"
-              className="bg-fuelup-green text-white rounded-lg py-3 flex items-center justify-center font-medium"
-              onClick={handleRate}
-            >
-              <Star size={18} className="mr-2 fill-yellow-400" />
-              Rate
-            </Button>
           </div>
         </div>
         
