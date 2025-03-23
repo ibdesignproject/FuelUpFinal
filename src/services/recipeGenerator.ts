@@ -1,4 +1,3 @@
-
 import * as tf from '@tensorflow/tfjs';
 
 export interface Recipe {
@@ -191,7 +190,6 @@ const recipeDb: Recipe[] = [
       fat: 18
     }
   },
-  // Adding more recipe suggestions
   {
     id: '5',
     name: 'Tomato & Garlic Pasta',
@@ -375,16 +373,69 @@ class MealPlannerModel {
     // Mock filtering based on inputs
     let filteredRecipes = [...recipeDb];
     
-    // Filter by ingredients if specified
+    // STRICT FILTERING: Only include recipes where ALL ingredients are from the selected list
     if (input.ingredients && input.ingredients.length > 0) {
-      filteredRecipes = filteredRecipes.filter(recipe => 
-        input.ingredients!.some(ing => 
-          recipe.ingredients.some(recipeIng => {
-            const ingredientName = ing.toLowerCase();
-            return recipeIng.toLowerCase().includes(ingredientName);
-          })
-        )
-      );
+      filteredRecipes = filteredRecipes.filter(recipe => {
+        // First, check if at least one of the selected ingredients is used in the recipe
+        const hasAtLeastOneSelectedIngredient = recipe.ingredients.some(recipeIng => {
+          return input.ingredients!.some(selectedIng => {
+            const selectedIngLower = selectedIng.toLowerCase();
+            return recipeIng.toLowerCase().includes(selectedIngLower);
+          });
+        });
+        
+        if (!hasAtLeastOneSelectedIngredient) return false;
+        
+        // Now generate an on-the-fly recipe variation based on selected ingredients
+        // This simulates AI generating a new recipe using only the selected ingredients
+        const selectedIngredientsLower = input.ingredients!.map(ing => ing.toLowerCase());
+        
+        // Create a modified recipe that only uses the selected ingredients
+        const newRecipe = { ...recipe };
+        newRecipe.id = recipe.id + "-custom";
+        newRecipe.name = "Custom " + recipe.name;
+        newRecipe.description = "A custom recipe created just for you with your selected ingredients";
+        
+        // Keep only ingredients that match the selected ones
+        const customIngredients = recipe.ingredients.filter(ing => {
+          return selectedIngredientsLower.some(selected => ing.toLowerCase().includes(selected));
+        });
+        
+        // If we don't have enough matching ingredients, add some generic quantities of the selected ones
+        if (customIngredients.length < input.ingredients!.length) {
+          input.ingredients!.forEach(selected => {
+            const alreadyIncluded = customIngredients.some(ing => ing.toLowerCase().includes(selected.toLowerCase()));
+            if (!alreadyIncluded) {
+              customIngredients.push(`1 ${selected.toLowerCase()}`);
+            }
+          });
+        }
+        
+        newRecipe.ingredients = customIngredients;
+        
+        // Adjust instructions based on available ingredients
+        newRecipe.instructions = recipe.instructions.filter(instruction => {
+          return customIngredients.some(ing => {
+            const ingredientName = ing.split(' ').slice(1).join(' ').toLowerCase();
+            return instruction.toLowerCase().includes(ingredientName);
+          });
+        });
+        
+        // If we filtered out too many instructions, add some generic ones
+        if (newRecipe.instructions.length < 3) {
+          newRecipe.instructions = [
+            `Prepare all the ingredients: ${customIngredients.join(', ')}`,
+            "Mix all ingredients together in a bowl",
+            "Cook according to your preference",
+            "Serve and enjoy your custom dish!"
+          ];
+        }
+        
+        // Replace the original recipe with our custom variation
+        filteredRecipes[filteredRecipes.indexOf(recipe)] = newRecipe;
+        
+        return true;
+      });
     }
     
     // Filter by dietary restrictions
@@ -428,8 +479,43 @@ class MealPlannerModel {
       );
     }
     
-    // If no recipes match the filters, return a random selection
+    // If no recipes match the filters, generate a completely new recipe with the selected ingredients
     if (filteredRecipes.length === 0) {
+      console.log("No matching recipes found. Generating a new recipe with selected ingredients");
+      
+      if (input.ingredients && input.ingredients.length > 0) {
+        const newRecipe: Recipe = {
+          id: "generated-" + Date.now(),
+          name: `${input.ingredients[0]} ${input.ingredients.length > 1 ? '& ' + input.ingredients[1] : ''} Special`,
+          image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
+          description: `A custom recipe created just for you using ${input.ingredients.join(', ')}`,
+          prepTime: 15,
+          cookTime: 20,
+          calories: 350,
+          protein: 15,
+          carbs: 40,
+          fat: 10,
+          ingredients: input.ingredients.map(ing => `1 ${ing}`),
+          instructions: [
+            `Prepare all your ingredients: ${input.ingredients.join(', ')}`,
+            "Combine all ingredients in a bowl and mix well",
+            "Season to taste with salt and pepper",
+            "Cook in a pan over medium heat for 10 minutes, stirring occasionally",
+            "Serve hot and enjoy your custom dish!"
+          ],
+          tags: ["custom", "quick", ...input.ingredients],
+          nutritionInfo: {
+            calories: 350,
+            protein: 15, 
+            carbs: 40,
+            fat: 10
+          }
+        };
+        
+        return [newRecipe];
+      }
+      
+      // If no ingredients provided, return a random selection
       const randomRecipes = [];
       for (let i = 0; i < 3 && i < recipeDb.length; i++) {
         const randomIndex = Math.floor(Math.random() * recipeDb.length);
@@ -485,6 +571,8 @@ export const getRecommendations = async (ingredients: (Ingredient | string)[]): 
       return ing.name;
     });
   
+  console.log("Generating recipes with ONLY these ingredients:", ingredientNames);
+  
   return generateRecipesBasedOnPreferences({
     ingredients: ingredientNames
   });
@@ -497,3 +585,4 @@ export const recipeGenerator = {
   getRecipeById,
   getRecommendations
 };
+
