@@ -3,11 +3,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&family=Open+Sans:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 60 33% 92%;
+    --background: 140 33% 96%;
     --foreground: 60 6% 26%;
 
     --card: 0 0% 100%;
@@ -16,26 +16,26 @@
     --popover: 0 0% 100%;
     --popover-foreground: 60 6% 26%;
 
-    --primary: 70 30% 70%;
-    --primary-foreground: 60 6% 26%;
+    --primary: 146 31% 44%;
+    --primary-foreground: 145 36% 98%;
 
-    --secondary: 70 30% 85%;
-    --secondary-foreground: 60 6% 26%;
+    --secondary: 145 20% 94%;
+    --secondary-foreground: 145 30% 24%;
 
-    --muted: 60 5% 90%;
-    --muted-foreground: 60 6% 40%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 220 14% 46%;
 
-    --accent: 70 30% 80%;
-    --accent-foreground: 60 6% 26%;
+    --accent: 146 39% 96%;
+    --accent-foreground: 146 30% 24%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 60 6% 96%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 70 30% 80%;
-    --input: 70 30% 80%;
-    --ring: 70 30% 70%;
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 146 31% 44%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
   }
 
   * {
@@ -43,45 +43,37 @@
   }
 
   body {
-    @apply bg-fuelup-bg text-fuelup-darktext font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
     position: relative;
   }
 
-  /* Add phone outline styling */
-  body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border: 10px solid #000;
-    border-radius: 40px;
-    pointer-events: none;
-    z-index: 1000;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tight;
+  }
+  
+  p, li, div {
+    @apply font-body;
   }
 
-  /* Notch styling */
-  body::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 150px;
-    height: 25px;
-    background-color: #000;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-    z-index: 1001;
-    pointer-events: none;
+  /* Minimize scrollbar presence but keep functionality */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-
-  input, button, textarea, select {
-    font-family: inherit;
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-fuelup-green/40 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-fuelup-green/60;
   }
 }
 
@@ -93,8 +85,6 @@
   overflow: hidden;
   position: relative;
   background-color: #f5f2ed;
-  box-sizing: border-box;
-  padding-top: 30px;
 }
 
 .bottom-nav {
@@ -126,6 +116,7 @@
   color: #8a8a8a;
   padding: 8px;
   margin: 0 5px;
+  transition: all 0.2s ease-in-out;
 }
 
 .nav-item.active {
@@ -148,6 +139,13 @@
   padding: 0 12px;
   color: #666666;
   text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.fuelup-input:focus {
+  border-color: #9ba46c;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(187, 192, 147, 0.2);
 }
 
 .fuelup-button {
@@ -159,6 +157,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.fuelup-button:hover {
+  background-color: #9ba46c;
 }
 
 .fuelup-card {
@@ -186,4 +189,67 @@
   color: #bbc093;
   font-size: 16px;
   margin-bottom: 8px;
+}
+
+.fuelup-bg {
+  background-color: #bbc093;
+}
+
+.fuelup-green {
+  color: #f5f2ed;
+}
+
+.fuelup-text {
+  color: #666666;
+}
+
+.fuelup-darktext {
+  color: #444444;
+}
+
+/* Animation Classes */
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 2s infinite;
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.checkbox-round {
+  width: 1.5em;
+  height: 1.5em;
+  background-color: white;
+  border-radius: 50%;
+  vertical-align: middle;
+  border: 1px solid #bbc093;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkbox-round:checked {
+  background-color: #bbc093;
 }

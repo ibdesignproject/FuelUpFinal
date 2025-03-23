@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
+import { userProfileService } from '@/services/userProfile';
+import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -12,7 +14,29 @@ const Index = () => {
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/options');
+    
+    // Basic validation
+    if (!phoneNumber || !password) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter both phone number and password.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Attempt login
+    const loginSuccess = userProfileService.login(phoneNumber, password);
+    
+    if (loginSuccess) {
+      navigate('/options');
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Invalid phone number or password.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -21,7 +45,8 @@ const Index = () => {
         <div className="page-content flex flex-col min-h-screen">
           <div className="flex-1 p-4">
             <div className="mt-8 mb-6">
-              <div className="text-fuelup-text text-xl">fuelup.com</div>
+              <h1 className="text-fuelup-text text-2xl font-heading">FuelUp</h1>
+              <p className="text-fuelup-text text-sm mt-1">Nutrition for Athletes</p>
             </div>
             
             <div className="fuelup-container mt-8">
