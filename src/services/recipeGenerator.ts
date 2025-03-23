@@ -16,8 +16,10 @@ export interface Recipe {
   instructions: string[];
   tags: string[];
   rating?: number;
+  popularity?: number;
+  timeAdded?: string;
   source?: string;
-  nutritionInfo?: {
+  nutritionInfo: {
     calories: number;
     protein: number;
     carbs: number;
@@ -147,6 +149,47 @@ const recipeDb: Recipe[] = [
       carbs: 50,
       fat: 12
     }
+  },
+  {
+    id: '4',
+    name: 'Protein-Packed Quinoa Salad',
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80',
+    description: 'A nutrient-dense salad that\'s perfect for lunch or a light dinner',
+    prepTime: 15,
+    cookTime: 20,
+    calories: 420,
+    protein: 22,
+    carbs: 45,
+    fat: 18,
+    ingredients: [
+      '1 cup quinoa, rinsed',
+      '2 cups vegetable or chicken broth',
+      '1 can (15 oz) chickpeas, drained and rinsed',
+      '1 cucumber, diced',
+      '1 cup cherry tomatoes, halved',
+      '1/2 red onion, finely diced',
+      '1/4 cup feta cheese, crumbled',
+      '1/4 cup fresh parsley, chopped',
+      '3 tbsp olive oil',
+      '2 tbsp lemon juice',
+      '1 tbsp Dijon mustard',
+      'Salt and pepper to taste'
+    ],
+    instructions: [
+      'Cook quinoa in broth according to package directions. Allow to cool completely.',
+      'In a large bowl, combine cooled quinoa, chickpeas, cucumber, tomatoes, red onion, feta cheese, and parsley.',
+      'In a small bowl, whisk together olive oil, lemon juice, Dijon mustard, salt, and pepper.',
+      'Pour dressing over quinoa mixture and toss to combine.',
+      'Refrigerate for at least 30 minutes before serving to allow flavors to meld.',
+      'Can be stored in the refrigerator for up to 3 days.'
+    ],
+    tags: ['lunch', 'high-protein', 'vegetarian', 'meal-prep'],
+    nutritionInfo: {
+      calories: 420,
+      protein: 22,
+      carbs: 45,
+      fat: 18
+    }
   }
 ];
 
@@ -181,9 +224,10 @@ class MealPlannerModel {
     if (input.ingredients && input.ingredients.length > 0) {
       filteredRecipes = filteredRecipes.filter(recipe => 
         input.ingredients!.some(ing => 
-          recipe.ingredients.some(recipeIng => 
-            recipeIng.toLowerCase().includes(ing.toLowerCase())
-          )
+          recipe.ingredients.some(recipeIng => {
+            const ingredientName = typeof ing === 'string' ? ing.toLowerCase() : ing.name.toLowerCase();
+            return recipeIng.toLowerCase().includes(ingredientName);
+          })
         )
       );
     }
@@ -282,8 +326,3 @@ export const recipeGenerator = {
   getRecommendations
 };
 
-export const recipeGeneratorService = {
-  generateRecipesBasedOnPreferences,
-  getRecipes,
-  getRecipeById
-};

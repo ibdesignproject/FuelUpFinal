@@ -3,16 +3,18 @@ import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { Search, Star, Clock, Bookmark, ChevronDown } from 'lucide-react';
-import { recipeGenerator } from '@/services/recipeGenerator';
+import { Recipe, recipeGenerator } from '@/services/recipeGenerator';
 import { userProfileService } from '@/services/userProfile';
 import { toast } from '@/components/ui/use-toast';
+import RecipeDetailView from '@/components/recipes/RecipeDetailView';
 
 const MealBrowsing = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [recipes, setRecipes] = useState<any[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'popular' | 'recent'>('all');
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   
   useEffect(() => {
     const loadRecipes = async () => {
@@ -60,7 +62,7 @@ const MealBrowsing = () => {
       return 0; // No sorting for 'all'
     });
   
-  const addToMeals = (recipe: any) => {
+  const addToMeals = (recipe: Recipe) => {
     userProfileService.addMeal({
       name: recipe.name,
       calories: recipe.nutritionInfo.calories,
@@ -75,6 +77,14 @@ const MealBrowsing = () => {
       title: "Recipe Added",
       description: `${recipe.name} has been added to your meals.`,
     });
+  };
+  
+  const openRecipeDetail = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+  };
+
+  const closeRecipeDetail = () => {
+    setSelectedRecipe(null);
   };
   
   return (
@@ -151,20 +161,30 @@ const MealBrowsing = () => {
                 </div>
               ) : (
                 filteredRecipes.map((recipe) => (
-                  <div key={recipe.id} className="fuelup-container p-3">
+                  <div key={recipe.id} className="fuelup-container p-3 cursor-pointer" onClick={() => openRecipeDetail(recipe)}>
                     <div className="flex space-x-4">
                       <div className="w-24 h-24 bg-fuelup-bg rounded flex items-center justify-center relative">
-                        <div className="w-8 h-8 rounded-full bg-fuelup-green mb-6"></div>
-                        <div className="absolute flex items-center justify-center">
-                          <svg viewBox="0 0 100 50" className="w-16 h-auto text-fuelup-green">
-                            <polyline 
-                              points="0,40 30,20 50,30 80,10" 
-                              fill="none" 
-                              stroke="currentColor" 
-                              strokeWidth="2"
-                            />
-                          </svg>
-                        </div>
+                        {recipe.image ? (
+                          <img 
+                            src={recipe.image} 
+                            alt={recipe.name} 
+                            className="w-full h-full object-cover rounded"
+                          />
+                        ) : (
+                          <>
+                            <div className="w-8 h-8 rounded-full bg-fuelup-green mb-6"></div>
+                            <div className="absolute flex items-center justify-center">
+                              <svg viewBox="0 0 100 50" className="w-16 h-auto text-fuelup-green">
+                                <polyline 
+                                  points="0,40 30,20 50,30 80,10" 
+                                  fill="none" 
+                                  stroke="currentColor" 
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            </div>
+                          </>
+                        )}
                       </div>
                       
                       <div className="flex-1">
@@ -173,7 +193,10 @@ const MealBrowsing = () => {
                           <div className="flex items-center space-x-1">
                             <button 
                               className="p-1.5 rounded-full bg-fuelup-bg/30 hover:bg-fuelup-bg transition-colors"
-                              onClick={() => addToMeals(recipe)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                addToMeals(recipe);
+                              }}
                             >
                               <Bookmark size={16} className="text-fuelup-green" />
                             </button>
@@ -196,7 +219,7 @@ const MealBrowsing = () => {
                           
                           <div className="flex items-center text-xs">
                             <Clock size={12} className="mr-1" />
-                            <span>{Math.floor(Math.random() * 30) + 5} min</span>
+                            <span>{recipe.prepTime + recipe.cookTime} min</span>
                           </div>
                         </div>
                       </div>
@@ -209,6 +232,10 @@ const MealBrowsing = () => {
           
           <BottomNavigation />
         </div>
+        
+        {selectedRecipe && (
+          <RecipeDetailView recipe={selectedRecipe} onClose={closeRecipeDetail} />
+        )}
       </div>
     </PageTransition>
   );

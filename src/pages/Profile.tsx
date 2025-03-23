@@ -3,9 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
-import { Check, Calendar as CalendarIcon } from 'lucide-react';
+import { Check, Square } from 'lucide-react';
 import { userProfileService } from '@/services/userProfile';
 import { toast } from '@/components/ui/use-toast';
+
+interface Goal {
+  id: string;
+  text: string;
+  checked: boolean;
+}
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -17,6 +23,13 @@ const Profile = () => {
     sport: '',
     competitionDate: ''
   });
+  
+  const [goals, setGoals] = useState<Goal[]>([
+    { id: '1', text: 'Increase daily water intake', checked: true },
+    { id: '2', text: 'Increase daily protein intake', checked: true },
+    { id: '3', text: 'Stop unhealthy snacking', checked: true },
+    { id: '4', text: 'Quit processed drinks', checked: true },
+  ]);
 
   useEffect(() => {
     // Load user data from localStorage
@@ -37,7 +50,18 @@ const Profile = () => {
         });
       }
     }
+    
+    // Load saved goals if they exist
+    const savedGoals = localStorage.getItem('userGoals');
+    if (savedGoals) {
+      setGoals(JSON.parse(savedGoals));
+    }
   }, []);
+  
+  // Save goals to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('userGoals', JSON.stringify(goals));
+  }, [goals]);
 
   const handleEditProfile = () => {
     navigate('/options');
@@ -46,6 +70,17 @@ const Profile = () => {
   const handleLogout = () => {
     userProfileService.logout();
     navigate('/');
+  };
+  
+  const toggleGoal = (id: string) => {
+    setGoals(goals.map(goal => 
+      goal.id === id ? { ...goal, checked: !goal.checked } : goal
+    ));
+    
+    toast({
+      title: "Goal updated",
+      description: "Your fitness goal has been updated.",
+    });
   };
 
   return (
@@ -101,33 +136,24 @@ const Profile = () => {
               <h3 className="text-fuelup-green text-xl mb-4">Select all goals that apply to you:</h3>
               
               <div className="space-y-3">
-                <div className="flex items-center">
-                  <div className="w-6 h-6 flex items-center justify-center bg-fuelup-green rounded mr-3">
-                    <Check size={16} className="text-white" />
+                {goals.map((goal) => (
+                  <div 
+                    key={goal.id} 
+                    className="flex items-center cursor-pointer"
+                    onClick={() => toggleGoal(goal.id)}
+                  >
+                    <div className="w-6 h-6 flex items-center justify-center rounded mr-3 transition-colors">
+                      {goal.checked ? (
+                        <div className="w-6 h-6 bg-fuelup-green rounded flex items-center justify-center">
+                          <Check size={16} className="text-white" />
+                        </div>
+                      ) : (
+                        <Square size={22} className="text-fuelup-green" />
+                      )}
+                    </div>
+                    <span className="text-fuelup-green">{goal.text}</span>
                   </div>
-                  <span className="text-fuelup-green">Increase daily water intake</span>
-                </div>
-                
-                <div className="flex items-center">
-                  <div className="w-6 h-6 flex items-center justify-center bg-fuelup-green rounded mr-3">
-                    <Check size={16} className="text-white" />
-                  </div>
-                  <span className="text-fuelup-green">Increase daily protein intake</span>
-                </div>
-                
-                <div className="flex items-center">
-                  <div className="w-6 h-6 flex items-center justify-center bg-fuelup-green rounded mr-3">
-                    <Check size={16} className="text-white" />
-                  </div>
-                  <span className="text-fuelup-green">Stop unhealthy snacking</span>
-                </div>
-                
-                <div className="flex items-center">
-                  <div className="w-6 h-6 flex items-center justify-center bg-fuelup-green rounded mr-3">
-                    <Check size={16} className="text-white" />
-                  </div>
-                  <span className="text-fuelup-green">Quit processed drinks</span>
-                </div>
+                ))}
               </div>
             </div>
           </div>

@@ -69,7 +69,9 @@ const MealGenerator = () => {
         return;
       }
       
-      const recommendations = await recipeGenerator.getRecommendations(ingredients);
+      // Get selected ingredients only
+      const selectedIngredients = ingredients.filter(ing => ing.selected);
+      const recommendations = await recipeGenerator.getRecommendations(selectedIngredients);
       
       if (recommendations.length === 0) {
         toast({
@@ -101,11 +103,22 @@ const MealGenerator = () => {
     const updatedIngredients = [...ingredients];
     updatedIngredients[index].selected = !updatedIngredients[index].selected;
     setIngredients(updatedIngredients);
+    
+    toast({
+      title: updatedIngredients[index].selected ? "Ingredient Added" : "Ingredient Removed",
+      description: `${updatedIngredients[index].name} ${updatedIngredients[index].selected ? "added to" : "removed from"} your selection.`,
+    });
   };
   
   // Add a new ingredient
   const addIngredient = () => {
-    if (!newIngredient.trim()) return;
+    if (!newIngredient.trim()) {
+      toast({
+        title: "Empty Ingredient",
+        description: "Please enter an ingredient name.",
+      });
+      return;
+    }
     
     // Check if ingredient already exists
     if (ingredients.some(ing => ing.name.toLowerCase() === newIngredient.toLowerCase())) {
@@ -116,7 +129,8 @@ const MealGenerator = () => {
       return;
     }
     
-    setIngredients([...ingredients, { name: newIngredient, selected: true }]);
+    const newIngredientObj = { name: newIngredient, selected: true };
+    setIngredients([...ingredients, newIngredientObj]);
     setNewIngredient('');
     
     toast({
@@ -160,6 +174,18 @@ const MealGenerator = () => {
   
   const currentRecipe = recipes.length > 0 ? recipes[currentRecipeIndex] : null;
   
+  // Remove an ingredient
+  const removeIngredient = (index: number) => {
+    const updatedIngredients = [...ingredients];
+    updatedIngredients.splice(index, 1);
+    setIngredients(updatedIngredients);
+    
+    toast({
+      title: "Ingredient Removed",
+      description: `${ingredients[index].name} has been removed from your ingredients.`,
+    });
+  };
+  
   return (
     <PageTransition>
       <div className="app-container">
@@ -197,7 +223,7 @@ const MealGenerator = () => {
                   <div className="flex flex-wrap gap-2 mb-4">
                     {filteredIngredients.map((ingredient, index) => (
                       <div 
-                        key={index} 
+                        key={ingredient.name} 
                         className={`px-3 py-1 rounded-md cursor-pointer flex items-center gap-1 transition-colors ${
                           ingredient.selected ? 'bg-fuelup-bg text-fuelup-green' : 'bg-fuelup-green/30 text-fuelup-green'
                         }`}
@@ -213,6 +239,32 @@ const MealGenerator = () => {
                     ))}
                   </div>
                   
+                  <div className="bg-fuelup-bg/20 p-3 rounded-md mb-4">
+                    <h3 className="font-medium mb-2">Selected Ingredients:</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {ingredients.filter(ing => ing.selected).length === 0 ? (
+                        <p className="text-sm">No ingredients selected yet</p>
+                      ) : (
+                        ingredients.filter(ing => ing.selected).map((ing, idx) => (
+                          <div 
+                            key={idx} 
+                            className="bg-fuelup-bg text-white px-2 py-1 rounded-full text-sm flex items-center"
+                          >
+                            {ing.name}
+                            <X 
+                              size={14} 
+                              className="ml-1 cursor-pointer" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleIngredient(ingredients.indexOf(ing));
+                              }}
+                            />
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                  
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -220,7 +272,7 @@ const MealGenerator = () => {
                       value={newIngredient}
                       onChange={(e) => setNewIngredient(e.target.value)}
                       className="fuelup-input bg-fuelup-bg flex-1"
-                      onKeyPress={(e) => e.key === 'Enter' && addIngredient()}
+                      onKeyDown={(e) => e.key === 'Enter' && addIngredient()}
                     />
                     <button 
                       className="fuelup-button py-0 px-4 rounded-md"
@@ -254,17 +306,27 @@ const MealGenerator = () => {
                 <div className="relative my-6">
                   <div className="bg-fuelup-bg rounded-lg p-4">
                     <div className="aspect-square flex items-center justify-center relative mb-4">
-                      <div className="w-16 h-16 rounded-full bg-fuelup-green mb-8"></div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <svg viewBox="0 0 100 50" className="w-3/4 h-auto text-fuelup-green">
-                          <polyline 
-                            points="0,40 30,20 50,30 80,10" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="2"
-                          />
-                        </svg>
-                      </div>
+                      {currentRecipe.image ? (
+                        <img 
+                          src={currentRecipe.image} 
+                          alt={currentRecipe.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <>
+                          <div className="w-16 h-16 rounded-full bg-fuelup-green mb-8"></div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <svg viewBox="0 0 100 50" className="w-3/4 h-auto text-fuelup-green">
+                              <polyline 
+                                points="0,40 30,20 50,30 80,10" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="2"
+                              />
+                            </svg>
+                          </div>
+                        </>
+                      )}
                     </div>
                     
                     <h3 className="text-xl font-medium text-center mb-2">{currentRecipe.name}</h3>
