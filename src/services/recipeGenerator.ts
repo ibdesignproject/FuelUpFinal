@@ -1,3 +1,4 @@
+
 import * as tf from '@tensorflow/tfjs';
 
 export interface Recipe {
@@ -305,12 +306,18 @@ export const getRecipeById = (id: string): Recipe | undefined => {
   return recipeDb.find(recipe => recipe.id === id);
 };
 
+// Define the Ingredient type more clearly
+interface Ingredient {
+  name: string;
+  selected: boolean;
+}
+
 // Add this function to get recommendations based on ingredients
-export const getRecommendations = async (ingredients: any[]): Promise<Recipe[]> => {
+export const getRecommendations = async (ingredients: (Ingredient | string)[]): Promise<Recipe[]> => {
   // Extract ingredient names if they're objects with a name property
   const ingredientNames = ingredients
-    .filter((ing): ing is { name: string; selected: boolean } | string => 
-      typeof ing === 'object' ? 'selected' in ing && ing.selected : true)
+    .filter((ing): ing is Ingredient | string => 
+      typeof ing === 'object' ? ing !== null && 'selected' in ing && ing.selected : true)
     .map(ing => 
       typeof ing === 'string' ? ing : ing.name
     );
