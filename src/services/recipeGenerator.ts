@@ -17,6 +17,12 @@ export interface Recipe {
   tags: string[];
   rating?: number;
   source?: string;
+  nutritionInfo?: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
 
 interface GeneratorInput {
@@ -64,7 +70,13 @@ const recipeDb: Recipe[] = [
       'Pour sauce over the mixture, stirring constantly until thickened, about 1-2 minutes.',
       'Drizzle with sesame oil before serving.'
     ],
-    tags: ['high-protein', 'dinner', 'muscle-building', 'quick']
+    tags: ['high-protein', 'dinner', 'muscle-building', 'quick'],
+    nutritionInfo: {
+      calories: 450,
+      protein: 40,
+      carbs: 30,
+      fat: 15
+    }
   },
   {
     id: '2',
@@ -94,7 +106,13 @@ const recipeDb: Recipe[] = [
       'Before eating, top with berries and a tablespoon of almond butter.',
       'Can be stored in refrigerator for up to 3 days.'
     ],
-    tags: ['breakfast', 'pre-workout', 'high-carb', 'no-cook']
+    tags: ['breakfast', 'pre-workout', 'high-carb', 'no-cook'],
+    nutritionInfo: {
+      calories: 350,
+      protein: 20,
+      carbs: 45,
+      fat: 10
+    }
   },
   {
     id: '3',
@@ -122,7 +140,13 @@ const recipeDb: Recipe[] = [
       'Pour into a bowl and top with sliced banana, granola, chia seeds, and additional berries.',
       'Consume immediately for optimal nutrition.'
     ],
-    tags: ['post-workout', 'recovery', 'high-protein', 'no-cook']
+    tags: ['post-workout', 'recovery', 'high-protein', 'no-cook'],
+    nutritionInfo: {
+      calories: 380,
+      protein: 25,
+      carbs: 50,
+      fat: 12
+    }
   }
 ];
 
@@ -236,6 +260,26 @@ export const getRecipes = (): Recipe[] => {
 
 export const getRecipeById = (id: string): Recipe | undefined => {
   return recipeDb.find(recipe => recipe.id === id);
+};
+
+// Add this function to get recommendations based on ingredients
+export const getRecommendations = async (ingredients: any[]): Promise<Recipe[]> => {
+  // Extract ingredient names if they're objects with a name property
+  const ingredientNames = ingredients.filter(ing => ing.selected).map(ing => 
+    typeof ing === 'string' ? ing : ing.name
+  );
+  
+  return generateRecipesBasedOnPreferences({
+    ingredients: ingredientNames
+  });
+};
+
+// Export the service as an object with methods
+export const recipeGenerator = {
+  generateRecipesBasedOnPreferences,
+  getRecipes,
+  getRecipeById,
+  getRecommendations
 };
 
 export const recipeGeneratorService = {
