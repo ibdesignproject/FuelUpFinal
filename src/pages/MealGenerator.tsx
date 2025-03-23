@@ -29,6 +29,12 @@ const MealGenerator = () => {
     { name: "Mushroom", selected: false },
     { name: "Eggplant", selected: false },
     { name: "Zucchini", selected: false },
+    { name: "Lettuce", selected: false },
+    { name: "Kale", selected: false },
+    { name: "Sweet Potato", selected: false },
+    { name: "Cabbage", selected: false },
+    { name: "Corn", selected: false },
+    { name: "Peas", selected: false },
     // Fruits
     { name: "Apple", selected: false }, 
     { name: "Lime", selected: false },
@@ -37,6 +43,9 @@ const MealGenerator = () => {
     { name: "Cucumber", selected: false },
     { name: "Banana", selected: false },
     { name: "Avocado", selected: false },
+    { name: "Berries", selected: false },
+    { name: "Pineapple", selected: false },
+    { name: "Mango", selected: false },
     // Protein
     { name: "Chicken", selected: false },
     { name: "Beef", selected: false },
@@ -44,6 +53,11 @@ const MealGenerator = () => {
     { name: "Fish", selected: false },
     { name: "Eggs", selected: false },
     { name: "Tofu", selected: false },
+    { name: "Shrimp", selected: false },
+    { name: "Turkey", selected: false },
+    { name: "Beans", selected: false },
+    { name: "Lentils", selected: false },
+    { name: "Chickpeas", selected: false },
     // Staples
     { name: "Rice", selected: false },
     { name: "Pasta", selected: false },
@@ -53,7 +67,12 @@ const MealGenerator = () => {
     { name: "Cheese", selected: false },
     { name: "Yogurt", selected: false },
     { name: "Butter", selected: false },
-    { name: "Oil", selected: false }
+    { name: "Oil", selected: false },
+    { name: "Mayo", selected: false },
+    { name: "Honey", selected: false },
+    { name: "Peanut Butter", selected: false },
+    { name: "Nuts", selected: false },
+    { name: "Oats", selected: false }
   ]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -97,7 +116,7 @@ const MealGenerator = () => {
       
       toast({
         title: "Generating Recipes",
-        description: `Creating recipes using ONLY ${selectedIngredients.map(ing => ing.name).join(', ')}`,
+        description: `Creating tailored recipes using your selected ingredients`,
       });
       
       const recommendations = await recipeGenerator.getRecommendations(selectedIngredients);
@@ -112,7 +131,7 @@ const MealGenerator = () => {
         setCurrentRecipeIndex(0);
         toast({
           title: "Recipes Generated",
-          description: `Created ${recommendations.length} recipes with ONLY your selected ingredients.`,
+          description: `Created ${recommendations.length} customized recipes for your ingredients.`,
         });
       }
     } catch (error) {
@@ -281,7 +300,7 @@ const MealGenerator = () => {
                 <h2 className="text-xl font-medium text-fuelup-green">
                   {recipes.length === 0 
                     ? "Select ingredients and generate recipes..." 
-                    : "Recipe suggestions for you"}
+                    : "Tailored recipe suggestions for you"}
                 </h2>
               </div>
               
