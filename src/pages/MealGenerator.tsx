@@ -192,30 +192,30 @@ const MealGenerator = () => {
         <div className="page-content flex flex-col min-h-screen">
           <div className="flex-1 p-4">
             <div className="mt-8 mb-6">
-              <h1 className="text-fuelup-green text-2xl font-heading">FuelUp AI Meal Generator</h1>
+              <h1 className="text-fuelup-text text-2xl font-heading font-bold">FuelUp AI Meal Generator</h1>
             </div>
             
-            <div className="fuelup-container mb-6">
+            <div className="bg-fuelup-green rounded-lg shadow-md mb-6">
               <div 
-                className="flex justify-between items-center mb-4 cursor-pointer"
+                className="flex justify-between items-center p-4 cursor-pointer"
                 onClick={() => setShowIngredients(!showIngredients)}
               >
-                <span className="font-medium">Ingredients available</span>
+                <span className="font-medium text-fuelup-bg text-lg">Ingredients available</span>
                 <ChevronDown 
                   size={20} 
-                  className={`transition-transform duration-300 ${!showIngredients ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-300 text-fuelup-bg ${!showIngredients ? 'rotate-180' : ''}`}
                 />
               </div>
               
               {showIngredients && (
-                <>
+                <div className="p-4 pt-0">
                   <div className="relative mb-4">
                     <input
                       type="text"
-                      placeholder="Search..."
+                      placeholder="Search ingredients..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="fuelup-input bg-fuelup-bg pl-10"
+                      className="fuelup-input bg-fuelup-bg pl-10 text-fuelup-text border-fuelup-bg"
                     />
                     <Search className="absolute left-3 top-3.5 text-fuelup-green" size={20} />
                   </div>
@@ -225,7 +225,9 @@ const MealGenerator = () => {
                       <div 
                         key={ingredient.name} 
                         className={`px-3 py-1 rounded-md cursor-pointer flex items-center gap-1 transition-colors ${
-                          ingredient.selected ? 'bg-fuelup-bg text-fuelup-green' : 'bg-fuelup-green/30 text-fuelup-green'
+                          ingredient.selected 
+                            ? 'bg-fuelup-bg text-fuelup-text font-medium' 
+                            : 'bg-fuelup-bg/30 text-fuelup-bg hover:bg-fuelup-bg/50'
                         }`}
                         onClick={() => toggleIngredient(ingredients.indexOf(ingredient))}
                       >
@@ -239,21 +241,21 @@ const MealGenerator = () => {
                     ))}
                   </div>
                   
-                  <div className="bg-fuelup-bg/20 p-3 rounded-md mb-4">
-                    <h3 className="font-medium mb-2">Selected Ingredients:</h3>
+                  <div className="bg-fuelup-bg/80 p-3 rounded-md mb-4">
+                    <h3 className="font-medium mb-2 text-fuelup-green">Selected Ingredients:</h3>
                     <div className="flex flex-wrap gap-2">
                       {ingredients.filter(ing => ing.selected).length === 0 ? (
-                        <p className="text-sm">No ingredients selected yet</p>
+                        <p className="text-sm text-fuelup-text">No ingredients selected yet</p>
                       ) : (
                         ingredients.filter(ing => ing.selected).map((ing, idx) => (
                           <div 
                             key={idx} 
-                            className="bg-fuelup-bg text-white px-2 py-1 rounded-full text-sm flex items-center"
+                            className="bg-fuelup-bg text-fuelup-text px-2 py-1 rounded-full text-sm flex items-center border border-fuelup-green"
                           >
                             {ing.name}
                             <X 
                               size={14} 
-                              className="ml-1 cursor-pointer" 
+                              className="ml-1 cursor-pointer text-fuelup-green" 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleIngredient(ingredients.indexOf(ing));
@@ -268,20 +270,20 @@ const MealGenerator = () => {
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Add ingredient..."
+                      placeholder="Add new ingredient..."
                       value={newIngredient}
                       onChange={(e) => setNewIngredient(e.target.value)}
-                      className="fuelup-input bg-fuelup-bg flex-1"
+                      className="fuelup-input bg-fuelup-bg flex-1 text-fuelup-text"
                       onKeyDown={(e) => e.key === 'Enter' && addIngredient()}
                     />
                     <button 
-                      className="fuelup-button py-0 px-4 rounded-md"
+                      className="bg-fuelup-bg text-fuelup-green py-0 px-4 rounded-md font-medium hover:bg-fuelup-bg/90"
                       onClick={addIngredient}
                     >
                       Add
                     </button>
                   </div>
-                </>
+                </div>
               )}
             </div>
             
@@ -289,23 +291,25 @@ const MealGenerator = () => {
               <Button 
                 onClick={generateRecipes}
                 disabled={isGenerating}
-                className="bg-fuelup-bg text-fuelup-green hover:bg-fuelup-bg/80 py-2 px-6 rounded-lg font-medium"
+                className="bg-fuelup-green text-fuelup-bg hover:bg-fuelup-green/90 py-2 px-6 rounded-lg font-medium shadow-sm"
               >
                 {isGenerating ? "Generating..." : "Generate Recipe Suggestions"}
               </Button>
             </div>
             
-            <div className="fuelup-container">
-              <h2 className="text-xl mb-4 font-medium">
-                {recipes.length === 0 
-                  ? "Select ingredients and generate recipes..." 
-                  : "Recipe suggestions for you"}
-              </h2>
+            <div className="bg-fuelup-bg rounded-lg shadow-md">
+              <div className="p-4 border-b border-fuelup-green/30">
+                <h2 className="text-xl font-medium text-fuelup-green">
+                  {recipes.length === 0 
+                    ? "Select ingredients and generate recipes..." 
+                    : "Recipe suggestions for you"}
+                </h2>
+              </div>
               
               {currentRecipe ? (
-                <div className="relative my-6">
-                  <div className="bg-fuelup-bg rounded-lg p-4">
-                    <div className="aspect-square flex items-center justify-center relative mb-4">
+                <div className="relative p-4">
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <div className="aspect-square flex items-center justify-center relative mb-4 bg-fuelup-green/10 rounded-lg overflow-hidden">
                       {currentRecipe.image ? (
                         <img 
                           src={currentRecipe.image} 
@@ -329,45 +333,45 @@ const MealGenerator = () => {
                       )}
                     </div>
                     
-                    <h3 className="text-xl font-medium text-center mb-2">{currentRecipe.name}</h3>
-                    <p className="text-sm mb-4 text-center">{currentRecipe.description}</p>
+                    <h3 className="text-xl font-medium text-center mb-2 text-fuelup-text">{currentRecipe.name}</h3>
+                    <p className="text-sm mb-4 text-center text-fuelup-text">{currentRecipe.description}</p>
                     
-                    <div className="bg-fuelup-green/20 rounded-lg p-3 mb-4">
-                      <h4 className="font-medium mb-2">Ingredients:</h4>
+                    <div className="bg-fuelup-green/10 rounded-lg p-3 mb-4">
+                      <h4 className="font-medium mb-2 text-fuelup-green">Ingredients:</h4>
                       <ul className="list-disc pl-5 space-y-1">
                         {currentRecipe.ingredients.map((ing, idx) => (
-                          <li key={idx} className="text-sm">{ing}</li>
+                          <li key={idx} className="text-sm text-fuelup-text">{ing}</li>
                         ))}
                       </ul>
                     </div>
                     
-                    <div className="bg-fuelup-green/20 rounded-lg p-3 mb-4">
-                      <h4 className="font-medium mb-2">Instructions:</h4>
+                    <div className="bg-fuelup-green/10 rounded-lg p-3 mb-4">
+                      <h4 className="font-medium mb-2 text-fuelup-green">Instructions:</h4>
                       <ol className="list-decimal pl-5 space-y-1">
                         {currentRecipe.instructions.map((step, idx) => (
-                          <li key={idx} className="text-sm">{step}</li>
+                          <li key={idx} className="text-sm text-fuelup-text">{step}</li>
                         ))}
                       </ol>
                     </div>
                     
-                    <div className="bg-fuelup-green/20 rounded-lg p-3 mb-4">
-                      <h4 className="font-medium mb-2">Nutrition Info:</h4>
+                    <div className="bg-fuelup-green/10 rounded-lg p-3 mb-4">
+                      <h4 className="font-medium mb-2 text-fuelup-green">Nutrition Info:</h4>
                       <div className="grid grid-cols-4 text-center">
                         <div>
-                          <p className="font-medium">{currentRecipe.nutritionInfo.calories}</p>
-                          <p className="text-xs">calories</p>
+                          <p className="font-medium text-fuelup-text">{currentRecipe.nutritionInfo.calories}</p>
+                          <p className="text-xs text-fuelup-text/70">calories</p>
                         </div>
                         <div>
-                          <p className="font-medium">{currentRecipe.nutritionInfo.protein}g</p>
-                          <p className="text-xs">protein</p>
+                          <p className="font-medium text-fuelup-text">{currentRecipe.nutritionInfo.protein}g</p>
+                          <p className="text-xs text-fuelup-text/70">protein</p>
                         </div>
                         <div>
-                          <p className="font-medium">{currentRecipe.nutritionInfo.carbs}g</p>
-                          <p className="text-xs">carbs</p>
+                          <p className="font-medium text-fuelup-text">{currentRecipe.nutritionInfo.carbs}g</p>
+                          <p className="text-xs text-fuelup-text/70">carbs</p>
                         </div>
                         <div>
-                          <p className="font-medium">{currentRecipe.nutritionInfo.fat}g</p>
-                          <p className="text-xs">fat</p>
+                          <p className="font-medium text-fuelup-text">{currentRecipe.nutritionInfo.fat}g</p>
+                          <p className="text-xs text-fuelup-text/70">fat</p>
                         </div>
                       </div>
                     </div>
@@ -375,7 +379,7 @@ const MealGenerator = () => {
                     <div className="flex justify-center">
                       <Button
                         onClick={addRecipeToMealLog}
-                        className="bg-fuelup-green hover:bg-fuelup-green/80 text-white py-2 px-6 rounded-lg font-medium"
+                        className="bg-fuelup-green hover:bg-fuelup-green/90 text-white py-2 px-6 rounded-lg font-medium shadow-sm"
                       >
                         Add to My Meals
                       </Button>
@@ -383,32 +387,32 @@ const MealGenerator = () => {
                   </div>
                   
                   <button 
-                    className="absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-fuelup-green rounded-full flex items-center justify-center"
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-fuelup-green rounded-full flex items-center justify-center shadow-md"
                     onClick={prevRecipe}
                   >
                     <ChevronLeft size={20} className="text-fuelup-bg" />
                   </button>
                   
                   <button 
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-fuelup-green rounded-full flex items-center justify-center"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-fuelup-green rounded-full flex items-center justify-center shadow-md"
                     onClick={nextRecipe}
                   >
                     <ChevronRight size={20} className="text-fuelup-bg" />
                   </button>
                   
-                  <p className="text-center mt-2">
+                  <p className="text-center mt-2 text-fuelup-text">
                     Recipe {currentRecipeIndex + 1} of {recipes.length}
                   </p>
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p>No recipes generated yet</p>
-                  <p className="text-sm mt-2">Select ingredients and click Generate</p>
+                  <p className="text-fuelup-text">No recipes generated yet</p>
+                  <p className="text-sm mt-2 text-fuelup-text/70">Select ingredients and click Generate</p>
                 </div>
               )}
               
               {recipes.length > 0 && (
-                <p className="text-center mb-4">All these recipes are made personally for you!</p>
+                <p className="text-center mb-4 p-4 text-fuelup-text">All these recipes are made personally for you!</p>
               )}
             </div>
           </div>

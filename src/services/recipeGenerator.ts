@@ -190,6 +190,161 @@ const recipeDb: Recipe[] = [
       carbs: 45,
       fat: 18
     }
+  },
+  // Adding more recipe suggestions
+  {
+    id: '5',
+    name: 'Tomato & Garlic Pasta',
+    image: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    description: 'A simple, flavorful pasta dish that\'s quick to make',
+    prepTime: 10,
+    cookTime: 15,
+    calories: 380,
+    protein: 12,
+    carbs: 65,
+    fat: 10,
+    ingredients: [
+      '8 oz whole wheat pasta',
+      '3 large tomatoes, diced',
+      '4 cloves garlic, minced',
+      '1/4 cup olive oil',
+      '1/4 cup fresh basil, chopped',
+      '2 tbsp balsamic vinegar',
+      '1/4 cup grated Parmesan cheese',
+      'Salt and pepper to taste',
+      'Red pepper flakes (optional)'
+    ],
+    instructions: [
+      'Cook pasta according to package directions until al dente.',
+      'While pasta cooks, heat olive oil in a large pan over medium heat.',
+      'Add garlic and sauté for 1 minute until fragrant.',
+      'Add diced tomatoes and cook for 5-7 minutes until they start to break down.',
+      'Stir in balsamic vinegar, salt, pepper, and red pepper flakes if using.',
+      'Drain pasta and add to the tomato sauce, tossing to combine.',
+      'Remove from heat and stir in fresh basil and Parmesan cheese.',
+      'Serve immediately, with additional Parmesan if desired.'
+    ],
+    tags: ['dinner', 'quick', 'vegetarian', 'tomato', 'garlic'],
+    nutritionInfo: {
+      calories: 380,
+      protein: 12,
+      carbs: 65,
+      fat: 10
+    }
+  },
+  {
+    id: '6',
+    name: 'Cucumber & Apple Smoothie',
+    image: 'https://images.unsplash.com/photo-1638176536925-12fef6968afb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    description: 'A refreshing, hydrating smoothie perfect for hot days',
+    prepTime: 5,
+    cookTime: 0,
+    calories: 150,
+    protein: 3,
+    carbs: 35,
+    fat: 1,
+    ingredients: [
+      '1 cucumber, peeled and chopped',
+      '1 green apple, cored and chopped',
+      '1 cup spinach',
+      '1/2 cup water',
+      '1/2 cup ice',
+      '1 tbsp lemon juice',
+      '1 tbsp honey or maple syrup (optional)',
+      '1/4 tsp ginger, grated (optional)'
+    ],
+    instructions: [
+      'Add all ingredients to a blender.',
+      'Blend on high until smooth and creamy.',
+      'Taste and adjust sweetness if needed.',
+      'Pour into glasses and serve immediately.'
+    ],
+    tags: ['breakfast', 'snack', 'low-calorie', 'no-cook', 'cucumber', 'apple'],
+    nutritionInfo: {
+      calories: 150,
+      protein: 3,
+      carbs: 35,
+      fat: 1
+    }
+  },
+  {
+    id: '7',
+    name: 'Potato & Onion Frittata',
+    image: 'https://images.unsplash.com/photo-1594834749740-74b3f6764be4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    description: 'A hearty, protein-rich breakfast or brunch option',
+    prepTime: 15,
+    cookTime: 25,
+    calories: 320,
+    protein: 18,
+    carbs: 30,
+    fat: 15,
+    ingredients: [
+      '8 large eggs',
+      '2 medium potatoes, thinly sliced',
+      '1 medium onion, thinly sliced',
+      '2 tbsp olive oil',
+      '1/4 cup milk',
+      '1/4 cup grated cheese (cheddar or Parmesan)',
+      '2 tbsp fresh herbs (parsley, chives, or basil)',
+      'Salt and pepper to taste'
+    ],
+    instructions: [
+      'Preheat oven to 375°F (190°C).',
+      'Heat olive oil in an oven-safe skillet over medium heat.',
+      'Add sliced potatoes and cook for 10 minutes until tender.',
+      'Add sliced onions and cook for another 5 minutes until soft and golden.',
+      'In a bowl, whisk together eggs, milk, salt, and pepper.',
+      'Pour egg mixture over the potatoes and onions in the skillet.',
+      'Sprinkle with grated cheese and cook for 2 minutes.',
+      'Transfer skillet to oven and bake for 15-18 minutes until set.',
+      'Sprinkle with fresh herbs before serving.'
+    ],
+    tags: ['breakfast', 'brunch', 'high-protein', 'potato', 'onion'],
+    nutritionInfo: {
+      calories: 320,
+      protein: 18,
+      carbs: 30,
+      fat: 15
+    }
+  },
+  {
+    id: '8',
+    name: 'Lemon Garlic Baked Chicken',
+    image: 'https://images.unsplash.com/photo-1604908177453-7462950a6a3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    description: 'Juicy, flavorful chicken with bright lemon and garlic notes',
+    prepTime: 10,
+    cookTime: 35,
+    calories: 300,
+    protein: 35,
+    carbs: 5,
+    fat: 16,
+    ingredients: [
+      '4 chicken breasts',
+      '2 lemons, one juiced and one sliced',
+      '4 cloves garlic, minced',
+      '2 tbsp olive oil',
+      '1 tbsp dried oregano',
+      '1 tsp dried thyme',
+      'Salt and pepper to taste',
+      '1/4 cup chicken broth'
+    ],
+    instructions: [
+      'Preheat oven to 400°F (200°C).',
+      'In a bowl, mix lemon juice, olive oil, minced garlic, oregano, thyme, salt, and pepper.',
+      'Place chicken breasts in a baking dish and pour the marinade over them.',
+      'Arrange lemon slices around and on top of the chicken.',
+      'Pour chicken broth into the bottom of the dish.',
+      'Bake for 30-35 minutes until chicken reaches an internal temperature of 165°F (74°C).',
+      'Let rest for 5 minutes before serving.',
+      'Spoon the pan juices over the chicken when serving.'
+    ],
+    tags: ['dinner', 'high-protein', 'low-carb', 'lemon', 'garlic'],
+    nutritionInfo: {
+      calories: 300,
+      protein: 35,
+      carbs: 5,
+      fat: 16
+    }
   }
 ];
 
