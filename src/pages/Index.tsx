@@ -5,11 +5,14 @@ import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 import { userProfileService } from '@/services/userProfile';
 import { toast } from '@/components/ui/use-toast';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +29,19 @@ const Index = () => {
     }
   }, [navigate]);
 
+  // Validate phone number whenever it changes
+  useEffect(() => {
+    setIsPhoneValid(phoneNumber.length === 10 && /^\d+$/.test(phoneNumber));
+  }, [phoneNumber]);
+
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow digits
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setPhoneNumber(value);
+    }
+  };
+
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -34,6 +50,15 @@ const Index = () => {
       toast({
         title: "Missing Information",
         description: "Please enter both phone number and password.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!isPhoneValid) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Please enter a 10-digit phone number.",
         variant: "destructive"
       });
       return;
@@ -81,15 +106,16 @@ const Index = () => {
               
               <form onSubmit={handleSignIn} className="space-y-6">
                 <div className="space-y-4">
-                  <input
+                  <Input
                     type="tel"
-                    placeholder="Phone Number"
+                    placeholder="Phone Number (10 digits)"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={handlePhoneNumberChange}
                     className="fuelup-input bg-fuelup-bg"
+                    maxLength={10}
                   />
                   
-                  <input
+                  <Input
                     type="password"
                     placeholder="Password"
                     value={password}
@@ -109,16 +135,17 @@ const Index = () => {
                   
                   <div className="flex-grow"></div>
                   
-                  <button 
+                  <Button 
                     type="submit" 
                     className="bg-fuelup-bg text-fuelup-green px-6 py-2 rounded-lg"
+                    disabled={!isPhoneValid || !password}
                   >
                     Submit
-                  </button>
+                  </Button>
                 </div>
                 
                 <div className="text-center text-fuelup-green">
-                  <p className="text-sm">For demo purposes, enter any phone number and password</p>
+                  <p className="text-sm">For demo purposes, enter any 10-digit number and password</p>
                 </div>
               </form>
             </div>
