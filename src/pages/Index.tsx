@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
@@ -11,6 +11,20 @@ const Index = () => {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const currentUser = userProfileService.getCurrentUser();
+    if (currentUser) {
+      // User is already logged in, check if we should go to options or profile
+      const savedData = localStorage.getItem('userFormData');
+      if (savedData) {
+        navigate('/profile');
+      } else {
+        navigate('/options');
+      }
+    }
+  }, [navigate]);
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,11 +39,24 @@ const Index = () => {
       return;
     }
     
+    // Save to localStorage if rememberMe is checked
+    if (rememberMe) {
+      localStorage.setItem('phoneNumber', phoneNumber);
+    } else {
+      localStorage.removeItem('phoneNumber');
+    }
+    
     // Attempt login
     const loginSuccess = userProfileService.login(phoneNumber, password);
     
     if (loginSuccess) {
-      navigate('/options');
+      // Check if user has already completed the form
+      const savedData = localStorage.getItem('userFormData');
+      if (savedData) {
+        navigate('/profile');
+      } else {
+        navigate('/options');
+      }
     } else {
       toast({
         title: "Login Failed",
@@ -45,7 +72,7 @@ const Index = () => {
         <div className="page-content flex flex-col min-h-screen">
           <div className="flex-1 p-4">
             <div className="mt-8 mb-6">
-              <h1 className="text-fuelup-text text-2xl font-heading">FuelUp</h1>
+              <h1 className="text-fuelup-text text-2xl">FuelUp</h1>
               <p className="text-fuelup-text text-sm mt-1">Nutrition for Athletes</p>
             </div>
             
@@ -88,6 +115,10 @@ const Index = () => {
                   >
                     Submit
                   </button>
+                </div>
+                
+                <div className="text-center text-fuelup-green">
+                  <p className="text-sm">For demo purposes, enter any phone number and password</p>
                 </div>
               </form>
             </div>

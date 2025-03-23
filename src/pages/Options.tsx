@@ -1,9 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Options = () => {
   const [name, setName] = useState("");
@@ -11,16 +16,41 @@ const Options = () => {
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
   const [sport, setSport] = useState("");
+  const [date, setDate] = useState<Date>();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load saved data if available
+    const savedData = localStorage.getItem('userFormData');
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      setName(parsedData.name || "");
+      setAge(parsedData.age || "");
+      setWeight(parsedData.weight || "");
+      setHeight(parsedData.height || "");
+      setSport(parsedData.sport || "");
+      if (parsedData.competitionDate) {
+        setDate(new Date(parsedData.competitionDate));
+      }
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Save to localStorage
+    const formData = {
+      name,
+      age,
+      weight,
+      height,
+      sport,
+      competitionDate: date ? format(date, 'PPP') : ''
+    };
+    
+    localStorage.setItem('userFormData', JSON.stringify(formData));
     navigate('/profile');
   };
-
-  // Calendar days
-  const days = Array.from({ length: 28 }, (_, i) => i + 1);
-  const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   return (
     <PageTransition>
@@ -79,30 +109,29 @@ const Options = () => {
                 <div className="mt-4">
                   <p className="text-lg mb-2">Date of next competition:</p>
                   
-                  <div className="bg-fuelup-bg rounded-lg p-3 mb-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <ChevronLeft className="text-fuelup-green" />
-                      <span className="text-fuelup-green">February 2017</span>
-                      <ChevronRight className="text-fuelup-green" />
-                    </div>
-                    
-                    <div className="grid grid-cols-7 gap-1">
-                      {weekdays.map((day, index) => (
-                        <div key={`weekday-${index}`} className="text-center text-fuelup-green">
-                          {day}
-                        </div>
-                      ))}
-                      
-                      {days.map((day) => (
-                        <div 
-                          key={`day-${day}`} 
-                          className="text-center text-fuelup-green py-1"
-                        >
-                          {day}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full bg-fuelup-bg border-0 text-fuelup-green justify-start text-left font-normal h-[45px]",
+                          !date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date ? format(date, "PPP") : <span>Select a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 
                 <div className="mt-4 flex justify-end">
