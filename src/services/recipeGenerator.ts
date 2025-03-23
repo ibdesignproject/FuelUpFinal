@@ -315,15 +315,18 @@ export interface Ingredient {
 export const getRecommendations = async (ingredients: (Ingredient | string)[]): Promise<Recipe[]> => {
   // Extract ingredient names if they're objects with a name property
   const ingredientNames = ingredients
-    .filter((ing): ing is Ingredient | string => 
-      typeof ing === 'object' ? ing !== null && 'selected' in ing && ing.selected : true)
-    .map(ing => {
-      // This explicit type checking helps TypeScript understand the structure
+    .filter((ing): ing is Ingredient | string => {
+      if (typeof ing === 'object') {
+        return ing !== null && 'selected' in ing && ing.selected;
+      }
+      return typeof ing === 'string';
+    })
+    .map((ing) => {
       if (typeof ing === 'string') {
         return ing;
-      } else {
-        return ing.name;
       }
+      // At this point TypeScript knows ing is Ingredient
+      return ing.name;
     });
   
   return generateRecipesBasedOnPreferences({
