@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 
 export interface UserProfile {
@@ -15,6 +14,7 @@ export interface UserProfile {
     protein: number;
     calories: number;
   };
+  sport?: string; // Added sport property as optional
 }
 
 export interface NutritionLog {
@@ -90,7 +90,8 @@ class UserProfileService {
           water: 3,
           protein: 5,
           calories: 2
-        }
+        },
+        sport: 'Basketball' // Added default sport
       };
       
       // Create sample nutrition log for today
