@@ -262,46 +262,6 @@ const Nutrition = () => {
                 </p>
               </div>
             </div>
-            
-            <div className="fuelup-container">
-              <h2 className="text-xl mb-4 font-medium">Today's Meals</h2>
-              
-              {nutritionLog?.meals && nutritionLog.meals.length > 0 ? (
-                <div className="space-y-4">
-                  {nutritionLog.meals.map((meal) => (
-                    <div key={meal.id} className="bg-fuelup-green/20 p-3 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-medium">{meal.name}</h3>
-                        <span className="text-sm">{meal.time}</span>
-                      </div>
-                      <div className="grid grid-cols-4 text-center text-sm">
-                        <div>
-                          <p className="font-medium">{meal.calories}</p>
-                          <p className="text-xs">calories</p>
-                        </div>
-                        <div>
-                          <p className="font-medium">{meal.protein}g</p>
-                          <p className="text-xs">protein</p>
-                        </div>
-                        <div>
-                          <p className="font-medium">{meal.carbs}g</p>
-                          <p className="text-xs">carbs</p>
-                        </div>
-                        <div>
-                          <p className="font-medium">{meal.fat}g</p>
-                          <p className="text-xs">fat</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p>No meals logged today</p>
-                  <p className="text-sm mt-2">Use the Meal Generator to add meals</p>
-                </div>
-              )}
-            </div>
           </div>
           
           <BottomNavigation />
