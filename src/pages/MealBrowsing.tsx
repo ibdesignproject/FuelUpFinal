@@ -21,7 +21,7 @@ const MealBrowsing = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'popular' | 'recent' | 'sport'>('all');
+  const [filter, setFilter] = useState<'all' | 'popular' | 'recent' | 'sport'>('sport'); // Default to sport
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [commandOpen, setCommandOpen] = useState(false);
   const [sportSpecificRecipes, setSportSpecificRecipes] = useState<Recipe[]>([]);
@@ -34,7 +34,7 @@ const MealBrowsing = () => {
       return parsedData.sport || '';
     }
     const currentUser = userProfileService.getCurrentUser();
-    return currentUser?.sport || '';
+    return currentUser?.sport || 'Basketball'; // Default to Basketball if no sport found
   };
   
   // Generate 50 sport-specific recipes
@@ -205,8 +205,10 @@ const MealBrowsing = () => {
         // Generate sport-specific recipes
         const userSport = getUserSport();
         if (userSport) {
+          console.log("Generating recipes for sport:", userSport);
           const sportRecipes = generateSportRecipes(userSport);
           setSportSpecificRecipes(sportRecipes);
+          console.log(`Generated ${sportRecipes.length} sport-specific recipes`);
         }
       } catch (error) {
         console.error("Error loading recipes:", error);
@@ -233,10 +235,12 @@ const MealBrowsing = () => {
     }
     
     // Apply search filter
-    results = results.filter(recipe => 
-      recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    if (searchTerm) {
+      results = results.filter(recipe => 
+        recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
     
     // Apply sorting based on filter
     if (filter === 'popular') {
@@ -320,7 +324,7 @@ const MealBrowsing = () => {
                       <CommandGroup heading="Suggestions">
                         {getUserSport() && (
                           <CommandItem onSelect={() => {
-                            setSearchTerm(getUserSport());
+                            setSearchTerm("");
                             setCommandOpen(false);
                             setFilter('sport');
                           }}>
