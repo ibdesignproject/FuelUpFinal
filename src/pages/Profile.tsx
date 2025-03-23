@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
-import { Check, Square } from 'lucide-react';
+import { Check, LogOut, Square } from 'lucide-react';
 import { userProfileService } from '@/services/userProfile';
 import { toast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
 
 interface Goal {
   id: string;
@@ -63,12 +64,12 @@ const Profile = () => {
     localStorage.setItem('userGoals', JSON.stringify(goals));
   }, [goals]);
 
-  const handleEditProfile = () => {
-    navigate('/options');
-  };
-
   const handleLogout = () => {
     userProfileService.logout();
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account.",
+    });
     navigate('/');
   };
   
@@ -101,8 +102,14 @@ const Profile = () => {
               </div>
               
               <div className="mt-4 mb-2">
-                <button className="fuelup-button mb-2 w-full" onClick={handleEditProfile}>Edit Profile</button>
-                <button className="fuelup-button w-full" onClick={handleLogout}>Log Out</button>
+                <Button 
+                  className="fuelup-button w-full flex items-center justify-center gap-2" 
+                  onClick={handleLogout}
+                  variant="default"
+                >
+                  <LogOut size={18} />
+                  <span>Log Out</span>
+                </Button>
               </div>
             </div>
             
