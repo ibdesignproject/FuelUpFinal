@@ -315,9 +315,9 @@ export interface Ingredient {
 export const getRecommendations = async (ingredients: (Ingredient | string)[]): Promise<Recipe[]> => {
   // Extract ingredient names if they're objects with a name property
   const ingredientNames = ingredients
-    .filter((ing): ing is Ingredient | string => {
-      if (typeof ing === 'object') {
-        return ing !== null && 'selected' in ing && ing.selected;
+    .filter((ing) => {
+      if (typeof ing === 'object' && ing !== null) {
+        return 'selected' in ing && ing.selected;
       }
       return typeof ing === 'string';
     })
@@ -325,8 +325,8 @@ export const getRecommendations = async (ingredients: (Ingredient | string)[]): 
       if (typeof ing === 'string') {
         return ing;
       }
-      // At this point TypeScript knows ing is Ingredient
-      return ing.name;
+      // Now TypeScript knows this is an object with selected=true
+      return (ing as Ingredient).name;
     });
   
   return generateRecipesBasedOnPreferences({
@@ -341,3 +341,4 @@ export const recipeGenerator = {
   getRecipeById,
   getRecommendations
 };
+
