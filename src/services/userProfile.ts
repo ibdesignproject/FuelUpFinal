@@ -148,13 +148,16 @@ class UserProfileService {
     // Clear current user
     this.currentUser = null;
     
+    // Clear nutrition logs
+    this.nutritionLogs = [];
+    
     // Clear localStorage items
     localStorage.removeItem('userProfile');
     localStorage.removeItem('nutritionLogs');
     
     toast({
       title: "Logged out",
-      description: "You have been logged out successfully.",
+      description: "You have been logged out successfully and nutrition tracking has been reset.",
     });
   }
   
