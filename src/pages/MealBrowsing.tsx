@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
-import { Search, Star, Clock, Bookmark, ChevronDown } from 'lucide-react';
+import { Search, Star, Clock, Bookmark, ChevronDown, Image } from 'lucide-react';
 import { Recipe, recipeGenerator } from '@/services/recipeGenerator';
 import { userProfileService } from '@/services/userProfile';
 import { toast } from '@/components/ui/use-toast';
@@ -26,7 +25,6 @@ const MealBrowsing = () => {
   const [commandOpen, setCommandOpen] = useState(false);
   const [sportSpecificRecipes, setSportSpecificRecipes] = useState<Recipe[]>([]);
   
-  // Get user sport from profile
   const getUserSport = (): string => {
     const userData = localStorage.getItem('userFormData');
     if (userData) {
@@ -37,12 +35,10 @@ const MealBrowsing = () => {
     return currentUser?.sport || 'Basketball'; // Default to Basketball if no sport found
   };
   
-  // Generate 50 sport-specific recipes
   const generateSportRecipes = (sport: string): Recipe[] => {
     const sportBasedRecipes: Recipe[] = [];
     const sportPrefix = sport.toLowerCase();
     
-    // Define nutrition profiles based on sport types
     const getNutritionProfile = (sport: string) => {
       const profiles: Record<string, {protein: number, carbs: number, fat: number, calories: number}> = {
         'basketball': {protein: 25, carbs: 55, fat: 20, calories: 500},
@@ -62,10 +58,8 @@ const MealBrowsing = () => {
         'martial arts': {protein: 28, carbs: 52, fat: 20, calories: 500},
       };
       
-      // Default profile if sport not found
       const defaultProfile = {protein: 25, carbs: 55, fat: 20, calories: 450};
       
-      // Find the closest matching sport
       for (const key in profiles) {
         if (sport.toLowerCase().includes(key)) {
           return profiles[key];
@@ -77,7 +71,6 @@ const MealBrowsing = () => {
     
     const profile = getNutritionProfile(sportPrefix);
     
-    // Recipe ingredients based on sport
     const getIngredientsByNutrition = (profile: any) => {
       const ingredients = {
         highProtein: ['chicken breast', 'salmon', 'tuna', 'turkey', 'lean beef', 'tofu', 'tempeh', 'eggs', 'greek yogurt', 'cottage cheese', 'protein powder', 'lentils', 'chickpeas', 'black beans', 'quinoa'],
@@ -102,13 +95,11 @@ const MealBrowsing = () => {
         result.push(ingredients.healthyFats[Math.floor(Math.random() * ingredients.healthyFats.length)]);
       }
       
-      return [...new Set(result)]; // Remove duplicates
+      return [...new Set(result)];
     };
     
-    // Recipe preparation methods
     const prepMethods = ['baked', 'grilled', 'roasted', 'sautéed', 'steamed', 'raw', 'slow-cooked', 'pressure-cooked', 'stir-fried', 'boiled'];
     
-    // Recipe types based on sport
     const getRecipeTypesBySport = (sport: string) => {
       const sportLower = sport.toLowerCase();
       const types = {
@@ -119,7 +110,6 @@ const MealBrowsing = () => {
         technical: ['brain food', 'focus enhancer', 'steady energy meal', 'nutrient-dense snack', 'mental clarity bowl']
       };
       
-      // Map sports to categories
       const enduranceSports = ['running', 'cycling', 'swimming', 'triathlon', 'marathon'];
       const strengthSports = ['weightlifting', 'crossfit', 'bodybuilding', 'powerlifting', 'strength training'];
       const teamSports = ['basketball', 'football', 'soccer', 'volleyball', 'hockey', 'baseball'];
@@ -134,17 +124,14 @@ const MealBrowsing = () => {
       return [...types[category as keyof typeof types], ...types.default];
     };
     
-    // Generate 50 random recipes
     for (let i = 1; i <= 50; i++) {
       const ingredients = getIngredientsByNutrition(profile);
       const recipeTypes = getRecipeTypesBySport(sportPrefix);
       const prepMethod = prepMethods[Math.floor(Math.random() * prepMethods.length)];
       const recipeType = recipeTypes[Math.floor(Math.random() * recipeTypes.length)];
       
-      // Get main ingredients (first 2-3)
       const mainIngredients = ingredients.slice(0, Math.floor(Math.random() * 2) + 2);
       
-      // Random nutrition variations (+/- 10%)
       const proteinVar = profile.protein * (0.9 + Math.random() * 0.2);
       const carbsVar = profile.carbs * (0.9 + Math.random() * 0.2);
       const fatVar = profile.fat * (0.9 + Math.random() * 0.2);
@@ -170,8 +157,8 @@ const MealBrowsing = () => {
           'Combine all ingredients and serve.'
         ],
         tags: [sport.toLowerCase(), recipeType, prepMethod, 'performance'],
-        rating: Math.floor(Math.random() * 3) + 3, // 3-5 star rating
-        popularity: Math.floor(Math.random() * 80) + 20, // 20-100 popularity
+        rating: Math.floor(Math.random() * 3) + 3,
+        popularity: Math.floor(Math.random() * 80) + 20,
         timeAdded: new Date(Date.now() - Math.random() * 604800000).toISOString(),
         nutritionInfo: {
           calories: Math.round(caloriesVar),
@@ -189,20 +176,15 @@ const MealBrowsing = () => {
     const loadRecipes = async () => {
       setLoading(true);
       try {
-        // For demo purposes, we'll use the existing recipe generator with empty ingredients
         const allRecipes = await recipeGenerator.getRecommendations([]);
-        
-        // Add some mock data for UI
         const enhancedRecipes = allRecipes.map(recipe => ({
           ...recipe,
           rating: Math.floor(Math.random() * 5) + 1,
-          timeAdded: new Date(Date.now() - Math.random() * 604800000).toISOString(), // Random time within last week
+          timeAdded: new Date(Date.now() - Math.random() * 604800000).toISOString(),
           popularity: Math.floor(Math.random() * 100) + 1
         }));
-        
         setRecipes(enhancedRecipes);
         
-        // Generate sport-specific recipes
         const userSport = getUserSport();
         if (userSport) {
           console.log("Generating recipes for sport:", userSport);
@@ -225,16 +207,13 @@ const MealBrowsing = () => {
     loadRecipes();
   }, []);
   
-  // Filter recipes based on search term and selected filter
   const filteredRecipes = () => {
     let results = [...recipes];
     
-    // Add sport-specific recipes if that filter is selected
     if (filter === 'sport') {
       results = [...sportSpecificRecipes];
     }
     
-    // Apply search filter
     if (searchTerm) {
       results = results.filter(recipe => 
         recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -242,7 +221,6 @@ const MealBrowsing = () => {
       );
     }
     
-    // Apply sorting based on filter
     if (filter === 'popular') {
       return results.sort((a, b) => b.popularity! - a.popularity!);
     } else if (filter === 'recent') {
@@ -252,6 +230,16 @@ const MealBrowsing = () => {
     }
     
     return results;
+  };
+  
+  const getRecipeImage = (recipe: Recipe) => {
+    if (recipe.image) return recipe.image;
+    
+    const nameHash = recipe.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const keywords = recipe.name.split(' ').filter(word => word.length > 3).join(',');
+    const queryTerms = keywords || recipe.ingredients[0] || 'food';
+    
+    return `https://source.unsplash.com/featured/300x200/?${queryTerms}&sig=${nameHash}`;
   };
   
   const addToMeals = (recipe: Recipe) => {
@@ -414,27 +402,22 @@ const MealBrowsing = () => {
                 filteredRecipes().map((recipe) => (
                   <div key={recipe.id} className="fuelup-container p-3 cursor-pointer" onClick={() => openRecipeDetail(recipe)}>
                     <div className="flex space-x-4">
-                      <div className="w-24 h-24 bg-fuelup-bg rounded flex items-center justify-center relative">
-                        {recipe.image ? (
+                      <div className="w-24 h-24 bg-fuelup-bg rounded flex items-center justify-center relative overflow-hidden">
+                        {recipe.image || getRecipeImage(recipe) ? (
                           <img 
-                            src={recipe.image} 
+                            src={recipe.image || getRecipeImage(recipe)} 
                             alt={recipe.name} 
                             className="w-full h-full object-cover rounded"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = 'https://source.unsplash.com/featured/300x200/?food';
+                            }}
                           />
                         ) : (
-                          <>
-                            <div className="w-8 h-8 rounded-full bg-fuelup-green mb-6"></div>
-                            <div className="absolute flex items-center justify-center">
-                              <svg viewBox="0 0 100 50" className="w-16 h-auto text-fuelup-green">
-                                <polyline 
-                                  points="0,40 30,20 50,30 80,10" 
-                                  fill="none" 
-                                  stroke="currentColor" 
-                                  strokeWidth="2"
-                                />
-                              </svg>
-                            </div>
-                          </>
+                          <div className="flex items-center justify-center w-full h-full">
+                            <Image size={32} className="text-fuelup-green opacity-50" />
+                          </div>
                         )}
                       </div>
                       
@@ -454,7 +437,7 @@ const MealBrowsing = () => {
                           </div>
                         </div>
                         
-                        <p className="text-sm mb-2">{recipe.description}</p>
+                        <p className="text-sm mb-2 line-clamp-2">{recipe.description}</p>
                         
                         <div className="flex justify-between items-center">
                           <div className="flex">
