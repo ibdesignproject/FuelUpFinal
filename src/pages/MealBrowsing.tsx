@@ -24,6 +24,7 @@ const MealBrowsing = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [commandOpen, setCommandOpen] = useState(false);
   const [sportSpecificRecipes, setSportSpecificRecipes] = useState<Recipe[]>([]);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({});
   
   const getUserSport = (): string => {
     const userData = localStorage.getItem('userFormData');
@@ -233,13 +234,28 @@ const MealBrowsing = () => {
   };
   
   const getRecipeImage = (recipe: Recipe) => {
-    if (recipe.image) return recipe.image;
+    if (recipe.image && recipe.image.length > 0) return recipe.image;
     
-    const nameHash = recipe.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const keywords = recipe.name.split(' ').filter(word => word.length > 3).join(',');
-    const queryTerms = keywords || recipe.ingredients[0] || 'food';
+    const defaultImages = [
+      'https://images.unsplash.com/photo-1546069901-ba9599a7e63c',
+      'https://images.unsplash.com/photo-1512621776951-a57141f2eefd',
+      'https://images.unsplash.com/photo-1467003909585-2f8a72700288',
+      'https://images.unsplash.com/photo-1490645935967-10de6ba17061',
+      'https://images.unsplash.com/photo-1515003197210-e0cd71810b5f',
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe',
+    ];
     
-    return `https://source.unsplash.com/featured/300x200/?${queryTerms}&sig=${nameHash}`;
+    const recipeIdHash = parseInt(recipe.id.replace(/[^0-9]/g, '0')) || 0;
+    const imageIndex = recipeIdHash % defaultImages.length;
+    
+    return defaultImages[imageIndex];
+  };
+  
+  const handleImageError = (recipeId: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [recipeId]: true
+    }));
   };
   
   const addToMeals = (recipe: Recipe) => {
@@ -403,16 +419,12 @@ const MealBrowsing = () => {
                   <div key={recipe.id} className="fuelup-container p-3 cursor-pointer" onClick={() => openRecipeDetail(recipe)}>
                     <div className="flex space-x-4">
                       <div className="w-24 h-24 bg-fuelup-bg rounded flex items-center justify-center relative overflow-hidden">
-                        {recipe.image || getRecipeImage(recipe) ? (
+                        {!imageErrors[recipe.id] ? (
                           <img 
-                            src={recipe.image || getRecipeImage(recipe)} 
+                            src={getRecipeImage(recipe)} 
                             alt={recipe.name} 
                             className="w-full h-full object-cover rounded"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.onerror = null;
-                              target.src = 'https://source.unsplash.com/featured/300x200/?food';
-                            }}
+                            onError={() => handleImageError(recipe.id)}
                           />
                         ) : (
                           <div className="flex items-center justify-center w-full h-full">
