@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import PageTransition from '@/components/common/PageTransition';
 import BottomNavigation from '@/components/layout/BottomNavigation';
@@ -105,7 +104,7 @@ const MealBrowsing = () => {
               setFilterOpen={setFilterOpen}
               filter={filter}
               setFilter={setFilter}
-              resultsCount={filteredRecipes().length}
+              resultsCount={filteredRecipes.length}
               sportRecipes={sportSpecificRecipes}
               userSport={getUserSport()}
             />
@@ -115,13 +114,13 @@ const MealBrowsing = () => {
                 <div className="text-center py-8">
                   <p>Loading recipes...</p>
                 </div>
-              ) : filteredRecipes().length === 0 ? (
+              ) : filteredRecipes.length === 0 ? (
                 <div className="text-center py-8">
                   <p>No recipes found</p>
                   <p className="text-sm mt-2">Try a different search term</p>
                 </div>
               ) : (
-                filteredRecipes().map((recipe) => (
+                filteredRecipes.map((recipe) => (
                   <RecipeCard
                     key={recipe.id}
                     recipe={recipe}

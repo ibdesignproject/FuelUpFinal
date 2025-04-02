@@ -1,4 +1,6 @@
+
 import { Recipe } from '@/services/recipeGenerator';
+import { userProfileService } from '@/services/userProfile';
 
 export const getRecipeImage = (recipe: Recipe) => {
   if (recipe.image && recipe.image.length > 0) return recipe.image;
